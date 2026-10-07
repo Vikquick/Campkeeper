@@ -1,0 +1,22 @@
+package-as: Campkeeper
+
+externals:
+  Campkeeper/Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+  Campkeeper/Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+  Campkeeper/Libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
+  Campkeeper/Libs/AceEvent-3.0: https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
+  Campkeeper/Libs/AceTimer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
+  Campkeeper/Libs/AceConsole-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConsole-3.0
+  Campkeeper/Libs/AceDB-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
+  Campkeeper/Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
+  Campkeeper/Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
+  Campkeeper/Libs/AceSerializer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
+  Campkeeper/Libs/AceComm-3.0: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
+  Campkeeper/Libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
+  Campkeeper/Libs/AceConfig-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
+  Campkeeper/Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+  Campkeeper/Libs/LibDataBroker-1.1:
+    url: https://github.com/tekkub/libdatabroker-1-1.git
+  Campkeeper/Libs/HereBeDragons:
+    url: https://github.com/Nevcairiel/HereBeDragons.git
+    tag: latest

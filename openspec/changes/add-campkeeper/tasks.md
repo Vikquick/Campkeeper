@@ -2,9 +2,9 @@
 
 ## 1. Каркас аддона и тестовый стенд
 
-- [ ] 1.1 Создать `Campkeeper/Campkeeper.toc` (`## Interface: 16001`, `## SavedVariables: CampkeeperDB`, порядок файлов) и `Campkeeper/Campkeeper.lua` (AceAddon, `ns.callbacks`); проверить, что все файлы из `.toc` существуют
-- [ ] 1.2 Написать `.pkgmeta` с externals (LibStub, CallbackHandler, Ace3, ChatThrottleLib, HereBeDragons-2.0, LibDataBroker-1.1, LibDBIcon-1.0) и `tools/fetch_libs.py`, который скачивает их в `Campkeeper/Libs/`; добавить `Campkeeper/Libs/` в `.gitignore`; проверить, что после `python tools/fetch_libs.py` все пути из `.toc` найдены
-- [ ] 1.3 Создать `tests/wowenv.py` (lua51 через lupa, заглушки WoW API, загрузка файлов по `.toc`) и `tests/test_smoke.py`, который загружает аддон и выполняет `OnInitialize`/`OnEnable`; проверить, что `python -m unittest discover tests` проходит
+- [x] 1.1 Создать `Campkeeper/Campkeeper.toc` (`## Interface: 16001`, `## SavedVariables: CampkeeperDB`, порядок файлов) и `Campkeeper/Campkeeper.lua` (AceAddon, `ns.callbacks`); проверить, что все файлы из `.toc` существуют
+- [x] 1.2 Написать `.pkgmeta` с externals (LibStub, CallbackHandler, Ace3, ChatThrottleLib, HereBeDragons-2.0, LibDataBroker-1.1, LibDBIcon-1.0) и `tools/fetch_libs.py`, который скачивает их в `Campkeeper/Libs/`; добавить `Campkeeper/Libs/` в `.gitignore`; проверить, что после `python tools/fetch_libs.py` все пути из `.toc` найдены
+- [x] 1.3 Создать `tests/wowenv.py` (lua51 через lupa, заглушки WoW API, загрузка файлов по `.toc`) и `tests/test_smoke.py`, который загружает аддон и выполняет `OnInitialize`/`OnEnable`; проверить, что `python -m unittest discover tests` проходит
 - [ ] 1.4 Сделать junction `Campkeeper` в `_classic_beta_\Interface\AddOns`; проверить в игре, что аддон загружается без ошибок Lua и без пометки «устарел»
 
 ## 2. Оболочка: утилиты, журнал, локализация, настройки

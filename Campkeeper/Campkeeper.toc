@@ -1,0 +1,12 @@
+## Interface: 16001
+## Title: Campkeeper
+## Notes: Campsite companion: camp panel, timers, shared camp map, catalog, group planner and alts.
+## Notes-ruRU: Компаньон лагерей: панель лагеря, таймеры, общая карта лагерей, каталог, планировщик группы и альты.
+## Author: Vikquick
+## Version: @project-version@
+## SavedVariables: CampkeeperDB
+## OptionalDeps: TomTom
+
+embeds.xml
+
+Campkeeper.lua
