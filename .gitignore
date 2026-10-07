@@ -1,0 +1,4 @@
+# Client dumps and generated reports (regenerate with ForeverApiDump + tools/fad.py)
+out/
+__pycache__/
+*.pyc

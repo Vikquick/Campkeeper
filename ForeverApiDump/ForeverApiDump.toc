@@ -1,0 +1,9 @@
+## Interface: 16001, 120100, 120105
+## Title: Forever API Dump
+## Notes: Dumps globals, C_ namespaces, API documentation, enums and CVars to SavedVariables for offline analysis.
+## Version: 0.1.0
+## SavedVariables: ForeverApiDumpDB
+
+ForeverApiDump.lua
+CampProbe.lua
+Scan.lua
