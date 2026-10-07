@@ -426,6 +426,30 @@ function CreateFramePool() return Mock.Stub() end
 function CreateUnsecuredRegionPoolInstance() return Mock.Stub() end
 
 ------------------------------------------------------------------------
+-- Settings panel (AceConfigDialog:AddToBlizOptions)
+------------------------------------------------------------------------
+Mock.settings = {}
+local nextCategoryID = 100
+local function newCategory(frame, name, parent)
+  nextCategoryID = nextCategoryID + 1
+  local c = { ID = nextCategoryID, name = name, frame = frame, parent = parent }
+  function c:GetID() return self.ID end
+  function c:GetName() return self.name end
+  Mock.settings[c.ID] = c
+  return c
+end
+Settings = {
+  RegisterCanvasLayoutCategory = function(frame, name) return newCategory(frame, name) end,
+  RegisterCanvasLayoutSubcategory = function(parent, frame, name) return newCategory(frame, name, parent) end,
+  RegisterAddOnCategory = function(c) c.registered = true end,
+  GetCategory = function(id)
+    for _, c in pairs(Mock.settings) do if c.ID == id or c.name == id then return c end end
+  end,
+  OpenToCategory = function(id) Mock.openedCategory = id end,
+}
+C_SettingsUtil = { OpenSettingsPanel = function(id) Mock.openedCategory = id end }
+
+------------------------------------------------------------------------
 -- Chat, slash commands, addon messages
 ------------------------------------------------------------------------
 SlashCmdList, hash_SlashCmdList = {}, {}

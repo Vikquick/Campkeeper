@@ -47,3 +47,29 @@ python tools/fad.py json   "<forever>\ForeverApiDump.lua" -o out/forever.json
 Лог пишется в `ForeverApiDumpDB.camp.log` (до 6000 записей).
 
 Тест инструментов без игры: `python tools/test_fad.py` (нужен `pip install --user lupa`).
+
+## 6. Campkeeper: разработка
+
+Аддон лежит в `Campkeeper/`, план работ — в `openspec/changes/add-campkeeper/tasks.md`.
+
+Библиотеки (Ace3, HereBeDragons, LibDBIcon и др.) в git не хранятся. Список — в `.pkgmeta`, при выпуске их встраивает BigWigs Packager, для разработки их скачивает скрипт (svn не нужен):
+
+```
+python tools/fetch_libs.py           — скачать недостающие в Campkeeper/Libs/
+python tools/fetch_libs.py --force   — скачать всё заново
+python tools/toc.py Campkeeper/Campkeeper.toc --check   — все ли файлы из .toc на месте
+```
+
+Тесты Lua вне игры (lupa, заглушки WoW API в `tests/wowmock.lua`):
+
+```
+python -m unittest discover tests
+```
+
+Подключение к клиенту беты (один раз, PowerShell):
+
+```
+New-Item -ItemType Junction -Path "E:\wow\World of Warcraft\_classic_beta_\Interface\AddOns\Campkeeper" -Target "C:\Users\vvvvi\addon\Campkeeper"
+```
+
+В игре: `/camp` — окно, `/camp config` — настройки, `/camp debug [all|clear]` — отладочный журнал (последние 200 записей, хранится в `CampkeeperDB`).

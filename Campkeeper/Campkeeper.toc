@@ -9,4 +9,11 @@
 
 embeds.xml
 
+Locales\enUS.lua
+Locales\ruRU.lua
+
 Campkeeper.lua
+Core\Log.lua
+Core\Util.lua
+
+UI\Options.lua

@@ -1,0 +1,17 @@
+local L = LibStub("AceLocale-3.0"):NewLocale("Campkeeper", "enUS", true)
+
+-- Interface strings only; game object names always come from the client.
+
+-- Slash commands
+L["Commands:"] = true
+L["/camp - open the Campkeeper window"] = true
+L["/camp config - open settings"] = true
+L["/camp debug [all||clear] - show the debug log"] = true
+L["Debug log: %d records"] = true
+L["Debug log cleared."] = true
+
+-- Options
+L["General"] = true
+L["Show camp panel"] = true
+L["Show the camp panel next to your buffs while you are near a camp."] = true
+L["Show minimap button"] = true
