@@ -64,6 +64,26 @@ class WowEnv:
         for f in lua_files:
             self.run_file(f)
 
+    def load_core(self, files):
+        """Load the given Campkeeper files with just what Core needs (LibStub, callbacks, locale)."""
+        self.load_files("Campkeeper", ["Libs/LibStub/LibStub.lua",
+                                       "Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua",
+                                       "Libs/AceLocale-3.0/AceLocale-3.0.lua",
+                                       "Locales/enUS.lua", "Locales/ruRU.lua"])
+        self.lua.eval("""function(ns)
+          ns.L = LibStub("AceLocale-3.0"):GetLocale("Campkeeper")
+          ns.callbacks = LibStub("CallbackHandler-1.0"):New(ns)
+        end""")(self.ns)
+        self.load_files("Campkeeper", files)
+
+    def fired(self, event):
+        """Start recording ns.callbacks events of this type; returns the list it appends args to."""
+        seen = []
+        self.lua.eval("""function(ns, event, sink)
+          ns.RegisterCallback(sink, event, function(_, ...) sink.add(...) end)
+        end""")(self.ns, event, self.lua.table_from({"add": lambda *a: seen.append(a)}))
+        return seen
+
     def fire(self, event, *args):
         self.mock.Fire(event, *args)
 

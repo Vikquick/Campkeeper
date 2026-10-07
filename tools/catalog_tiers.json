@@ -1,0 +1,98 @@
+{
+  "_comment": "Source of truth for the Campkeeper catalog. tools/gen_catalog.py resolves spells from out/scan.json and writes Campkeeper/Data/Catalog.lua. Object order is the protocol bit order: append new objects only, never reorder or remove.",
+  "auras": { "near": 1283391, "sitting": 1229739, "benefits": 1229741 },
+  "professions": {
+    "alchemy": 171, "blacksmithing": 164, "enchanting": 333, "engineering": 202,
+    "first_aid": 129, "fishing": 356, "herbalism": 182, "leatherworking": 165,
+    "mining": 186, "skinning": 393, "tailoring": 197, "cooking": 185
+  },
+  "classBuffs": {
+    "wisdom":            { "spells": [19742, 25894], "classes": ["PALADIN"] },
+    "kings":             { "spells": [20217, 25898], "classes": ["PALADIN"] },
+    "might":             { "spells": [19740, 25782], "classes": ["PALADIN"] },
+    "strength_of_earth": { "spells": [8076],         "classes": ["SHAMAN"] },
+    "mark_of_the_wild":  { "spells": [1126, 21849],  "classes": ["DRUID"] },
+    "moonkin_aura":      { "spells": [24907],        "classes": ["DRUID"] },
+    "fortitude":         { "spells": [1243, 21562],  "classes": ["PRIEST"] },
+    "divine_spirit":     { "spells": [14752, 27681], "classes": ["PRIEST"] },
+    "arcane_intellect":  { "spells": [1459, 23028],  "classes": ["MAGE"] }
+  },
+  "fires": [
+    { "tier": 1, "item": 279981, "skill": 1,   "slots": 3,  "burn": 600 },
+    { "tier": 2, "item": 279961, "skill": 140, "slots": 5,  "burn": 600 },
+    { "tier": 3, "item": 279974, "skill": 220, "slots": 10, "burn": 600 }
+  ],
+  "families": [
+    { "key": "alchemy", "profession": "alchemy", "exclusiveWith": ["wisdom"],
+      "weights": { "leveling": 2, "dungeon": 4, "craft": 3 },
+      "objects": [
+        { "key": "mana_well",   "tier": 1, "skill": 20,  "kind": "buff",    "items": [279956] },
+        { "key": "fermenter",   "tier": 2, "skill": 140, "kind": "reagent", "items": [279970] },
+        { "key": "alchemy_lab", "tier": 3, "skill": 300, "kind": "station", "items": [279990] } ] },
+    { "key": "blacksmithing", "profession": "blacksmithing", "exclusiveWith": ["strength_of_earth"],
+      "weights": { "leveling": 3, "dungeon": 3, "craft": 3 },
+      "objects": [
+        { "key": "sharpening_wheel", "tier": 1, "skill": 20,  "kind": "buff",    "items": [279944] },
+        { "key": "anvil",            "tier": 2, "skill": 140, "kind": "buff",    "items": [279988] },
+        { "key": "master_forge",     "tier": 3, "skill": 300, "kind": "station", "items": [279955] } ] },
+    { "key": "enchanting", "profession": "enchanting", "exclusiveWith": ["mark_of_the_wild"],
+      "weights": { "leveling": 3, "dungeon": 4, "craft": 3 },
+      "objects": [
+        { "key": "enchanted_lute",      "tier": 1, "skill": 20,  "kind": "buff",    "items": [279976] },
+        { "key": "arcane_disenchanter", "tier": 2, "skill": 140, "kind": "utility", "items": [279985] },
+        { "key": "arcane_forge",        "tier": 3, "skill": 300, "kind": "station", "items": [279987] } ] },
+    { "key": "engineering", "profession": "engineering", "exclusiveWith": [],
+      "weights": { "leveling": 1, "dungeon": 3, "craft": 3 },
+      "objects": [
+        { "key": "reagent_bot",         "tier": 1, "skill": 20,  "kind": "vendor",  "items": [279950] },
+        { "key": "repair_bot",          "tier": 2, "skill": 140, "kind": "vendor",  "items": [279949] },
+        { "key": "anarchist_workbench", "tier": 3, "skill": 300, "kind": "station", "items": [279989] } ] },
+    { "key": "first_aid", "profession": "first_aid", "exclusiveWith": ["fortitude"],
+      "weights": { "leveling": 3, "dungeon": 4, "craft": 1 },
+      "objects": [
+        { "key": "first_aid_kit", "tier": 1, "skill": 20,  "kind": "buff",    "items": [279968] },
+        { "key": "toxin_study",   "tier": 2, "skill": 140, "kind": "utility", "items": [279940] },
+        { "key": "plague_lab",    "tier": 3, "skill": 300, "kind": "utility", "items": [279951] } ] },
+    { "key": "fishing", "profession": "fishing", "exclusiveWith": ["kings"],
+      "weights": { "leveling": 4, "dungeon": 5, "craft": 1 },
+      "objects": [
+        { "key": "fish_bowl",    "tier": 1, "skill": 20,  "kind": "buff",   "items": [279967] },
+        { "key": "fishing_rack", "tier": 2, "skill": 140, "kind": "gather", "items": [279965] },
+        { "key": "fishing_hut",  "tier": 3, "skill": 300, "kind": "gather", "items": [279966] } ] },
+    { "key": "herbalism", "profession": "herbalism", "exclusiveWith": ["arcane_intellect"],
+      "weights": { "leveling": 2, "dungeon": 3, "craft": 2 },
+      "objects": [
+        { "key": "incense_candle",  "tier": 1, "skill": 20,  "kind": "buff",   "items": [279962] },
+        { "key": "greenhouse",      "tier": 2, "skill": 140, "kind": "gather", "items": [279964] },
+        { "key": "seed_hybridizer", "tier": 3, "skill": 300, "kind": "gather", "items": [279947] } ] },
+    { "key": "leatherworking", "profession": "leatherworking", "exclusiveWith": [],
+      "weights": { "leveling": 5, "dungeon": 0, "craft": 2 },
+      "objects": [
+        { "key": "camp_tent",      "tier": 1, "skill": 20,  "kind": "rest",    "items": [279978] },
+        { "key": "tanning_rack",   "tier": 2, "skill": 140, "kind": "reagent", "items": [279941] },
+        { "key": "sewing_machine", "tier": 3, "skill": 300, "kind": "station", "items": [279945] } ] },
+    { "key": "mining", "profession": "mining", "exclusiveWith": ["might"],
+      "weights": { "leveling": 3, "dungeon": 4, "craft": 2 },
+      "objects": [
+        { "key": "lodestone",   "tier": 1, "skill": 20,  "kind": "buff",    "items": [279960] },
+        { "key": "rock_garden", "tier": 2, "skill": 140, "kind": "gather",  "items": [279948] },
+        { "key": "smelter",     "tier": 3, "skill": 300, "kind": "station", "items": [279952] } ] },
+    { "key": "skinning", "profession": "skinning", "exclusiveWith": ["moonkin_aura"],
+      "weights": { "leveling": 3, "dungeon": 4, "craft": 1 },
+      "objects": [
+        { "key": "camp_chair",         "tier": 1, "skill": 20,  "kind": "buff",    "items": [279979] },
+        { "key": "field_guide",        "tier": 2, "skill": 140, "kind": "utility", "items": [279969] },
+        { "key": "trappers_workbench", "tier": 3, "skill": 300, "kind": "utility", "items": [279938] } ] },
+    { "key": "tailoring", "profession": "tailoring", "exclusiveWith": ["divine_spirit"],
+      "weights": { "leveling": 2, "dungeon": 2, "craft": 3 },
+      "objects": [
+        { "key": "faction_banner", "tier": 1, "skill": 20,  "kind": "buff",    "items": [279972, 279973] },
+        { "key": "spinning_wheel", "tier": 2, "skill": 140, "kind": "reagent", "items": [279943] },
+        { "key": "loom",           "tier": 3, "skill": 300, "kind": "station", "items": [279959] } ] },
+    { "key": "cooking", "profession": "cooking", "exclusiveWith": [],
+      "weights": { "leveling": 2, "dungeon": 3, "craft": 3 },
+      "objects": [
+        { "key": "cooking_feast", "tier": 2, "skill": 140, "kind": "food",    "items": [279957] },
+        { "key": "iron_oven",     "tier": 3, "skill": 300, "kind": "station", "items": [279982] } ] }
+  ]
+}

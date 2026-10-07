@@ -53,6 +53,10 @@ function Util.normalize(text)
   return Util.lower(strtrim(text))
 end
 
+local function wrap(tag, getFn)
+  return function(...) return Util.safeCall(tag, getFn(), ...) end
+end
+
 -- Thin client wrapper used by Core modules; tests replace individual entries.
 ns.api = {
   now = function() return GetTime() end,
@@ -60,4 +64,10 @@ ns.api = {
   inCombat = function()
     return Util.safeCall("InCombatLockdown", InCombatLockdown) == true
   end,
+  itemName = wrap("C_Item.GetItemNameByID", function() return C_Item and C_Item.GetItemNameByID end),
+  itemIcon = wrap("C_Item.GetItemIconByID", function() return C_Item and C_Item.GetItemIconByID end),
+  requestItem = wrap("C_Item.RequestLoadItemDataByID", function() return C_Item and C_Item.RequestLoadItemDataByID end),
+  spellName = wrap("C_Spell.GetSpellName", function() return C_Spell and C_Spell.GetSpellName end),
+  spellDescription = wrap("C_Spell.GetSpellDescription", function() return C_Spell and C_Spell.GetSpellDescription end),
+  requestSpell = wrap("C_Spell.RequestLoadSpellData", function() return C_Spell and C_Spell.RequestLoadSpellData end),
 }

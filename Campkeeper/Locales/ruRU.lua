@@ -1,6 +1,8 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Campkeeper", "ruRU")
 if not L then return end
 
+L["Loading..."] = "Загрузка…"
+
 -- Slash commands
 L["Commands:"] = "Команды:"
 L["/camp - open the Campkeeper window"] = "/camp — открыть окно Campkeeper"

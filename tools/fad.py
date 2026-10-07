@@ -207,7 +207,13 @@ def _fmt_flags(flags):
 # ---------------------------------------------------------------------------
 
 def cmd_json(args):
-    dump = load_dump(args.dump)
+    if args.key:
+        db = load_saved_variables(args.dump).get("ForeverApiDumpDB") or {}
+        if args.key not in db:
+            sys.exit(f"{args.dump}: no section {args.key!r} (have: {', '.join(sorted(db))})")
+        dump = db[args.key]
+    else:
+        dump = load_dump(args.dump)
     Path(args.output).write_text(json.dumps(dump, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
     print(f"wrote {args.output}")
 
@@ -311,6 +317,7 @@ def main(argv=None):
     j = sub.add_parser("json", help="convert SavedVariables to JSON")
     j.add_argument("dump")
     j.add_argument("-o", "--output", default="dump.json")
+    j.add_argument("--key", help="write this section of ForeverApiDumpDB instead of the API dump (scan, camp)")
     j.set_defaults(func=cmd_json)
 
     r = sub.add_parser("report", help="markdown API reference")

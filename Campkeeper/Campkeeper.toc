@@ -15,5 +15,7 @@ Locales\ruRU.lua
 Campkeeper.lua
 Core\Log.lua
 Core\Util.lua
+Data\Catalog.lua
+Core\Catalog.lua
 
 UI\Options.lua

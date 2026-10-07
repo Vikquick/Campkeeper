@@ -73,3 +73,21 @@ New-Item -ItemType Junction -Path "E:\wow\World of Warcraft\_classic_beta_\Inter
 ```
 
 В игре: `/camp` — окно, `/camp config` — настройки, `/camp debug [all|clear]` — отладочный журнал (последние 200 записей, хранится в `CampkeeperDB`).
+
+### Каталог лагерей после патча
+
+`Campkeeper/Data/Catalog.lua` генерируется, руками не правится. Состав объектов, тиры, классовые баффы и веса планировщика — в `tools/catalog_tiers.json`; ID заклинаний генератор берёт из сканирования клиента.
+
+1. В игре с включённым ForeverApiDump: `/fad scan camp`, дождаться «scan done», `/reload`.
+2. Выгрузить раздел сканирования:
+   ```
+   python tools/fad.py json "<клиент>\WTF\Account\<АККАУНТ>\SavedVariables\ForeverApiDump.lua" --key scan -o out/scan.json
+   ```
+3. Пересобрать и проверить:
+   ```
+   python tools/gen_catalog.py
+   git diff Campkeeper/Data/Catalog.lua
+   python -m unittest discover tests
+   ```
+
+Генератор останавливается с ошибкой, если предмета из таблицы нет в сканировании, навык не совпал или сдвинулся порядок объектов (это порядок битов в протоколе обмена — новые объекты только в конец). `python tools/gen_catalog.py --check` проверяет, что закоммиченный каталог актуален.

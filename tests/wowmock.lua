@@ -426,6 +426,33 @@ function CreateFramePool() return Mock.Stub() end
 function CreateUnsecuredRegionPoolInstance() return Mock.Stub() end
 
 ------------------------------------------------------------------------
+-- Item and spell data: entries in Mock.items / Mock.spells are "cached" unless loaded == false;
+-- Mock.LoadItem / Mock.LoadSpell finish a pending load and fire the client event.
+------------------------------------------------------------------------
+Mock.items, Mock.spells, Mock.requested = {}, {}, { items = {}, spells = {} }
+local function cached(t, id) local e = t[id]; return e and e.loaded ~= false and e or nil end
+C_Item = {
+  GetItemNameByID = function(id) local e = cached(Mock.items, id); return e and e.name end,
+  GetItemIconByID = function(id) local e = Mock.items[id]; return e and e.icon or 134400 end,
+  IsItemDataCachedByID = function(id) return cached(Mock.items, id) ~= nil end,
+  RequestLoadItemDataByID = function(id) Mock.requested.items[id] = true end,
+}
+C_Spell = {
+  GetSpellName = function(id) local e = cached(Mock.spells, id); return e and e.name end,
+  GetSpellDescription = function(id) local e = cached(Mock.spells, id); return e and e.description or "" end,
+  GetSpellTexture = function(id) local e = Mock.spells[id]; return e and e.icon or 136243 end,
+  RequestLoadSpellData = function(id) Mock.requested.spells[id] = true end,
+}
+function Mock.LoadItem(id, success)
+  if Mock.items[id] then Mock.items[id].loaded = true end
+  Mock.Fire("ITEM_DATA_LOAD_RESULT", id, success ~= false)
+end
+function Mock.LoadSpell(id, success)
+  if Mock.spells[id] then Mock.spells[id].loaded = true end
+  Mock.Fire("SPELL_DATA_LOAD_RESULT", id, success ~= false)
+end
+
+------------------------------------------------------------------------
 -- Settings panel (AceConfigDialog:AddToBlizOptions)
 ------------------------------------------------------------------------
 Mock.settings = {}

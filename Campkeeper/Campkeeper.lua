@@ -34,6 +34,8 @@ function Campkeeper:OnInitialize()
 end
 
 function Campkeeper:OnEnable()
+  self:RegisterEvent("ITEM_DATA_LOAD_RESULT", function(_, itemID, success) ns.Catalog:OnItemLoaded(itemID, success) end)
+  self:RegisterEvent("SPELL_DATA_LOAD_RESULT", function(_, spellID, success) ns.Catalog:OnSpellLoaded(spellID, success) end)
   ns.callbacks:Fire("ENABLED")
 end
 

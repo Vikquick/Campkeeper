@@ -2,6 +2,8 @@ local L = LibStub("AceLocale-3.0"):NewLocale("Campkeeper", "enUS", true)
 
 -- Interface strings only; game object names always come from the client.
 
+L["Loading..."] = true
+
 -- Slash commands
 L["Commands:"] = true
 L["/camp - open the Campkeeper window"] = true
