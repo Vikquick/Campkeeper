@@ -17,5 +17,7 @@ Core\Log.lua
 Core\Util.lua
 Data\Catalog.lua
 Core\Catalog.lua
+Core\CampState.lua
+Core\BenefitsParser.lua
 
 UI\Options.lua

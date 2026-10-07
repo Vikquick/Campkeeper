@@ -453,6 +453,68 @@ function Mock.LoadSpell(id, success)
 end
 
 ------------------------------------------------------------------------
+-- Player auras and their tooltips. Mock.AddAura/RefreshAura/RemoveAura fire UNIT_AURA with an
+-- updateInfo like the client's. Mock.secretAuras makes aura reads return secret values.
+------------------------------------------------------------------------
+Mock.auras, Mock.tooltips = {}, {}
+local nextAuraInstance = 1000
+-- A value issecretvalue() reports as secret (only tables can be marked in the mock).
+function Mock.Secret()
+  local s = {}
+  Mock.secrets = Mock.secrets or {}
+  Mock.secrets[s] = true
+  return s
+end
+local function auraCopy(a)
+  if Mock.secretAuras then
+    return { auraInstanceID = Mock.Secret(), spellId = Mock.Secret(), name = Mock.Secret(),
+             expirationTime = Mock.Secret(), duration = Mock.Secret() }
+  end
+  return { auraInstanceID = a.auraInstanceID, spellId = a.spellId, name = a.name,
+           expirationTime = a.expirationTime, duration = a.duration, isHelpful = true }
+end
+C_UnitAuras = {
+  GetPlayerAuraBySpellID = function(spellID)
+    for _, a in pairs(Mock.auras) do if a.spellId == spellID then return auraCopy(a) end end
+  end,
+  GetAuraDataByAuraInstanceID = function(unit, id)
+    local a = unit == "player" and Mock.auras[id]
+    return a and auraCopy(a) or nil
+  end,
+}
+function Mock.AddAura(spellId, duration, name)
+  nextAuraInstance = nextAuraInstance + 1
+  local a = { auraInstanceID = nextAuraInstance, spellId = spellId, name = name or ("aura" .. spellId),
+              duration = duration or 0, expirationTime = (duration and duration > 0) and (Mock.time + duration) or 0 }
+  Mock.auras[a.auraInstanceID] = a
+  Mock.Fire("UNIT_AURA", "player", { addedAuras = { auraCopy(a) } })
+  return a.auraInstanceID
+end
+function Mock.RefreshAura(id, duration)
+  local a = Mock.auras[id]
+  a.duration = duration or a.duration
+  a.expirationTime = Mock.time + a.duration
+  Mock.Fire("UNIT_AURA", "player", { updatedAuraInstanceIDs = { id } })
+end
+function Mock.RemoveAura(id)
+  Mock.auras[id] = nil
+  Mock.tooltips[id] = nil
+  Mock.Fire("UNIT_AURA", "player", { removedAuraInstanceIDs = { id } })
+end
+function Mock.AuraID(spellId)
+  for id, a in pairs(Mock.auras) do if a.spellId == spellId then return id end end
+end
+C_TooltipInfo = {
+  GetUnitBuffByAuraInstanceID = function(unit, id)
+    local t = unit == "player" and Mock.tooltips[id]
+    if not t then return nil end
+    local lines = {}
+    for i, text in ipairs(t) do lines[i] = { leftText = text } end
+    return { type = 7, lines = lines }
+  end,
+}
+
+------------------------------------------------------------------------
 -- Settings panel (AceConfigDialog:AddToBlizOptions)
 ------------------------------------------------------------------------
 Mock.settings = {}

@@ -33,9 +33,23 @@ function Campkeeper:OnInitialize()
   ns.callbacks:Fire("INITIALIZED")
 end
 
+-- Client events -> Core modules. Core never touches frames; this is the only wiring point.
 function Campkeeper:OnEnable()
   self:RegisterEvent("ITEM_DATA_LOAD_RESULT", function(_, itemID, success) ns.Catalog:OnItemLoaded(itemID, success) end)
   self:RegisterEvent("SPELL_DATA_LOAD_RESULT", function(_, spellID, success) ns.Catalog:OnSpellLoaded(spellID, success) end)
+
+  local auraFrame = CreateFrame("Frame")
+  auraFrame:RegisterUnitEvent("UNIT_AURA", "player")
+  auraFrame:SetScript("OnEvent", function(_, _, _, updateInfo) ns.CampState:OnUnitAura(updateInfo) end)
+  self.auraFrame = auraFrame
+  self:RegisterEvent("PLAYER_REGEN_ENABLED", function() ns.CampState:OnCombatEnded() end)
+  self:RegisterEvent("PLAYER_ENTERING_WORLD", function() ns.CampState:Rebuild() end)
+
+  ns.RegisterCallback(self, "CAMP_BENEFITS_GAINED", function(_, instanceID)
+    ns.BenefitsParser:Parse(instanceID, function(composition) ns.CampState:SetBenefits(instanceID, composition) end)
+  end)
+
+  ns.CampState:Rebuild()
   ns.callbacks:Fire("ENABLED")
 end
 
