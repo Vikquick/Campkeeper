@@ -1,0 +1,43 @@
+schema: spec-driven
+
+context: |
+  Language: ru
+  All artifacts must be written in ru.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Project: аддоны для World of Warcraft: Forever (Classic+, кап 60), публикация на CurseForge/Wago.
+  Запуск игры 2026-11-04; бета до ~2026-10-21.
+  Client: Forever 1.60.1, Interface 16001, WOW_PROJECT_ID 18 ("Camelot"); UI/API Mainline 12.x
+  с ограничениями Midnight (секретные значения в бою, issecretvalue, C_Secrets). Retail не поддерживаем.
+  Stack: Lua 5.1 (WoW), Ace3 (AceAddon, AceDB, AceComm, AceSerializer, AceConfig, AceConsole),
+  ChatThrottleLib, HereBeDragons-2.0, LibDataBroker, LibDBIcon; упаковка BigWigs Packager + GitHub Actions.
+  Tooling: Python 3.11, тесты Lua вне игры через lupa (lua51); dev-аддон ForeverApiDump и tools/fad.py
+  для дампа API клиента.
+  Products: Campkeeper — компаньон лагерей (панель и таймеры, пины на карте и обмен, каталог/планировщик/альты).
+  Sources of truth: docs/superpowers/specs/2026-10-08-campkeeper-design.md (дизайн),
+  docs/research/2026-10-08-campsite-client-data.md (ID аур, предметов, заклинаний, тиры),
+  out/forever-reference.md (справочник API, генерируется, в git не хранится).
+  Constraints: защищённые действия только вне боя; не полагаться на документацию retail без проверки
+  по дампу; все тексты интерфейса через Locales (ruRU и enUS).
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
