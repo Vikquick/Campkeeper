@@ -34,3 +34,16 @@ L["Camp benefits received."] = true
 L["Camp benefits end in 5 minutes."] = true
 L["Camping items are ready again."] = true
 L["Your campfire goes out in 1 minute."] = true
+
+-- Camp panel
+L["Camp"] = true
+L["goes out in %s"] = true
+L["Camping cooldown: %s"] = true
+L["placed"] = true
+L["click to place"] = true
+L["covered by a class buff"] = true
+L["Sit by the fire to get the camp benefits"] = true
+L["Stay seated: %d s"] = true
+L["Benefits until %s"] = true
+L["Camping items are on cooldown: %s"] = true
+L["Too close to another object or creature."] = true

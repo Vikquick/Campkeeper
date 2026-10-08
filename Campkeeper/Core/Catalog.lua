@@ -110,14 +110,28 @@ function Catalog:Description(key)
   return text
 end
 
+local buffNames, missingLogged = {}, {}
+
 -- Localized names of a class buff (all ranks share a name; greater versions have their own).
+-- Cached once complete; a spell without a name is requested and logged once per session.
 function Catalog:ClassBuffNames(buffKey)
-  local b, out = data.classBuffs[buffKey], {}
+  if buffNames[buffKey] then return buffNames[buffKey] end
+  local b, out, complete = data.classBuffs[buffKey], {}, true
   if not b then return out end
   for _, spell in ipairs(b.spells) do
     local n = ns.api.spellName(spell)
-    if n then out[#out + 1] = n else ns.log("catalog", "class buff %s: no name for spell %d", buffKey, spell) end
+    if n then
+      out[#out + 1] = n
+    else
+      complete = false
+      if not missingLogged[spell] then
+        missingLogged[spell] = true
+        ns.api.requestSpell(spell)
+        ns.log("catalog", "class buff %s: no name for spell %d", buffKey, spell)
+      end
+    end
   end
+  if complete then buffNames[buffKey] = out end
   return out
 end
 

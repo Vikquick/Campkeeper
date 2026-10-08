@@ -21,7 +21,9 @@ Core\CampState.lua
 Core\BenefitsParser.lua
 Core\Professions.lua
 Core\OwnCamp.lua
+Core\PanelModel.lua
 
 UI\Options.lua
 UI\Minimap.lua
 UI\Alerts.lua
+UI\Panel.lua

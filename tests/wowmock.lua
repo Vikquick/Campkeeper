@@ -127,6 +127,7 @@ function UnitClass(unit) if unit == "player" then return "Warrior", "WARRIOR", 1
 function UnitRace(unit) if unit == "player" then return "Human", "Human", 1 end end
 function UnitFactionGroup(unit) if unit == "player" then return "Alliance", "Alliance" end end
 function UnitLevel(unit) if unit == "player" then return 60 end end
+function IsShiftKeyDown() return Mock.shift == true end
 function UnitAffectingCombat(unit) return unit == "player" and Mock.inCombat end
 Mock.cvars = { rotateMinimap = "0", minimapZoom = "0", minimapInsideZoom = "0" }
 function GetCVar(name) return Mock.cvars[name] end
@@ -431,6 +432,15 @@ function CreateUnsecuredRegionPoolInstance() return Mock.Stub() end
 -- Mock.LoadItem / Mock.LoadSpell finish a pending load and fire the client event.
 ------------------------------------------------------------------------
 Mock.items, Mock.spells, Mock.requested = {}, {}, { items = {}, spells = {} }
+-- class buffs the catalog refers to (the client always knows these)
+for id, name in pairs({ [19742] = "Blessing of Wisdom", [25894] = "Greater Blessing of Wisdom",
+    [20217] = "Blessing of Kings", [25898] = "Greater Blessing of Kings", [19740] = "Blessing of Might",
+    [25782] = "Greater Blessing of Might", [8076] = "Strength of Earth", [1126] = "Mark of the Wild",
+    [21849] = "Gift of the Wild", [24907] = "Moonkin Aura", [1243] = "Power Word: Fortitude",
+    [21562] = "Prayer of Fortitude", [14752] = "Divine Spirit", [27681] = "Prayer of Spirit",
+    [1459] = "Arcane Intellect", [23028] = "Arcane Brilliance" }) do
+  Mock.spells[id] = { name = name }
+end
 local function cached(t, id) local e = t[id]; return e and e.loaded ~= false and e or nil end
 C_Item = {
   GetItemNameByID = function(id) local e = cached(Mock.items, id); return e and e.name end,
@@ -477,6 +487,10 @@ end
 C_UnitAuras = {
   GetPlayerAuraBySpellID = function(spellID)
     for _, a in pairs(Mock.auras) do if a.spellId == spellID then return auraCopy(a) end end
+  end,
+  GetAuraDataBySpellName = function(unit, name)
+    if unit ~= "player" then return nil end
+    for _, a in pairs(Mock.auras) do if a.name == name then return auraCopy(a) end end
   end,
   GetAuraDataByAuraInstanceID = function(unit, id)
     local a = unit == "player" and Mock.auras[id]

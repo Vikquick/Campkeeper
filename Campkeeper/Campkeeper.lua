@@ -92,6 +92,7 @@ function Campkeeper:OnEnable()
   ns.Professions:ScanAll()
   ns.OwnCamp:UpdateCooldown()
   ns.Alerts:Init()
+  ns.Panel:Init()
   ns.callbacks:Fire("ENABLED")
 end
 

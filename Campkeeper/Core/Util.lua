@@ -36,6 +36,14 @@ function Util.safeCall(tag, fn, ...)
   return finish(tag, pcall(fn, ...))
 end
 
+-- 75 -> "1:15", 3725 -> "1:02:05"
+function Util.formatDuration(seconds)
+  seconds = math.max(0, math.floor((seconds or 0) + 0.5))
+  local h, m, s = math.floor(seconds / 3600), math.floor(seconds % 3600 / 60), seconds % 60
+  if h > 0 then return ("%d:%02d:%02d"):format(h, m, s) end
+  return ("%d:%02d"):format(m, s)
+end
+
 -- Lowercase ASCII and UTF-8 Cyrillic (string.lower only knows ASCII); folds ё into е.
 function Util.lower(s)
   -- explicit byte range: string.lower and %u follow the C locale and can mangle UTF-8 bytes
@@ -99,6 +107,15 @@ function ns.api.recipeLearned(recipeID)
   local info = Util.safeCall("C_TradeSkillUI.GetRecipeInfo", C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo, recipeID)
   if info == nil then return nil end
   return info.learned == true
+end
+
+-- Whether the player has a helpful aura with this (localized) name; nil when unreadable.
+function ns.api.hasBuffNamed(name)
+  local get = C_UnitAuras and C_UnitAuras.GetAuraDataBySpellName
+  if not get then return nil end
+  local ok, aura = pcall(get, "player", name, "HELPFUL")
+  if not ok or Util.isSecret(aura) then return nil end
+  return aura ~= nil
 end
 
 local HBD = LibStub and LibStub("HereBeDragons-2.0", true)
