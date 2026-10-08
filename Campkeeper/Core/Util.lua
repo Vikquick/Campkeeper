@@ -132,6 +132,12 @@ function ns.api.playerPosition()
   return { mapID = mapID, x = x, y = y, wx = wx, wy = wy, instance = instance }
 end
 
+-- World coordinates of a map position (x, y in 0..1): wx, wy, instance.
+function ns.api.mapToWorld(mapID, x, y)
+  if not HBD or not mapID or not x or not y then return nil end
+  return HBD:GetWorldCoordinatesFromZone(x, y, mapID)
+end
+
 -- Distance in yards between two positions from playerPosition() (nil across instances).
 function ns.api.distance(a, b)
   if not (a and b and a.wx and b.wx) or a.instance ~= b.instance then return nil end

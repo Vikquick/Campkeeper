@@ -47,3 +47,15 @@ L["Stay seated: %d s"] = true
 L["Benefits until %s"] = true
 L["Camping items are on cooldown: %s"] = true
 L["Too close to another object or creature."] = true
+
+-- Map pins
+L["Age: %s"] = true
+L["Goes out in: %s"] = true
+L["Source: %s"] = true
+L["your camp"] = true
+L["seen by you"] = true
+L["group"] = true
+L["guild"] = true
+L["shared channel"] = true
+L["Unconfirmed: reported by one player"] = true
+L["Click: set a waypoint"] = true

@@ -13,6 +13,7 @@ ns.defaults = {
   global = {
     debugLog = {},
     chars = {},
+    camps = {},
   },
   char = {},
   profile = {
@@ -91,8 +92,10 @@ function Campkeeper:OnEnable()
   ns.CampState:Rebuild()
   ns.Professions:ScanAll()
   ns.OwnCamp:UpdateCooldown()
+  ns.CampStore:Init()
   ns.Alerts:Init()
   ns.Panel:Init()
+  ns.Pins:Init()
   ns.callbacks:Fire("ENABLED")
 end
 

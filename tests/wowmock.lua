@@ -413,7 +413,7 @@ function UnitPosition(unit)
   if unit ~= "player" then return nil end
   local p = Mock.player
   local x, y, instance = Mock.MapToWorld(p.mapID, p.x, p.y)
-  return y, x, 0, instance -- the client returns (y, x, z, instance) — HBD swaps accordingly
+  return x, y, 0, instance -- first value is the north axis, like GetWorldPosFromMapPos().x (HBD reads it as y)
 end
 function GetPlayerFacing() return Mock.player.facing end
 C_Minimap = { GetViewRadius = function() return 200 end }
