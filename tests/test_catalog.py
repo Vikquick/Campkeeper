@@ -72,7 +72,7 @@ class CatalogLoadingTest(unittest.TestCase):
         updated = env.fired("CATALOG_UPDATED")
 
         name, real = cat.Name(cat, "lodestone")
-        self.assertEqual((name, real), ("Загрузка…", False))
+        self.assertEqual((name, real), ("Загрузка...", False))
         self.assertTrue(env.mock.requested["items"][279960])
 
         env.lua.execute("Mock.items[279960].loaded = true")

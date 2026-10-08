@@ -23,6 +23,8 @@ Core\Professions.lua
 Core\OwnCamp.lua
 Core\PanelModel.lua
 Core\CampStore.lua
+Comm\Protocol.lua
+Comm\Comm.lua
 
 UI\Options.lua
 UI\Minimap.lua

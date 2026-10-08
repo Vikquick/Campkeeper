@@ -79,11 +79,17 @@ ns.api = {
   spellDescription = wrap("C_Spell.GetSpellDescription", function() return C_Spell and C_Spell.GetSpellDescription end),
   requestSpell = wrap("C_Spell.RequestLoadSpellData", function() return C_Spell and C_Spell.RequestLoadSpellData end),
   after = function(seconds, fn) C_Timer.After(seconds, fn) end,
+  random = function() return math.random() end,
   -- cancellable: returns a handle with :Cancel()
   timer = function(seconds, fn) return C_Timer.NewTimer(math.max(0, seconds), fn) end,
   itemCount = wrap("C_Item.GetItemCount", function() return C_Item and C_Item.GetItemCount end),
   itemCooldown = wrap("C_Container.GetItemCooldown", function() return C_Container and C_Container.GetItemCooldown end),
   isPlayerSpell = wrap("IsPlayerSpell", function() return IsPlayerSpell end),
+  mapInfo = wrap("C_Map.GetMapInfo", function() return C_Map and C_Map.GetMapInfo end),
+  isIgnored = function(name)
+    local f = C_FriendList and C_FriendList.IsIgnored
+    return f ~= nil and Util.safeCall("C_FriendList.IsIgnored", f, name) == true
+  end,
 }
 
 -- Professions as { [skillLineID] = { skill = n, max = n, name = s } }, or nil when unavailable.

@@ -614,7 +614,6 @@ SELECTED_CHAT_FRAME = DEFAULT_CHAT_FRAME
 NUM_CHAT_WINDOWS = 1
 function ChatFrame_AddMessageEventFilter() end
 function ChatFrame_RemoveMessageEventFilter() end
-function ChatFrame_RemoveChannel() end
 function SendChatMessage(msg, chatType, _, target)
   table.insert(Mock.sent, { kind = "chat", msg = msg, chatType = chatType, target = target })
 end
@@ -650,9 +649,13 @@ C_ChatInfo = {
 Enum.SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3, GeneralError = 9 }
 function BNSendGameData() end
 C_BattleNet = {}
-function GetChannelName() return 0 end
-function JoinTemporaryChannel() end
-function LeaveChannelByName() end
+Mock.channels, Mock.removedChannels, Mock.ignored = {}, {}, {}
+function GetChannelName(name) return Mock.channels[name] or 0, Mock.channels[name] and name or nil end
+function JoinTemporaryChannel(name) Mock.channels[name] = 5 end
+function LeaveChannelByName(name) Mock.channels[name] = nil end
+function ChatFrame_RemoveChannel(frame, name) table.insert(Mock.removedChannels, name) end
+function Ambiguate(name) return (name:gsub("%-.*$", "")) end
+C_FriendList = { IsIgnored = function(name) return Mock.ignored[name] == true end }
 function IsInGroup() return Mock.inGroup == true end
 function IsInRaid() return Mock.inRaid == true end
 function IsInGuild() return Mock.inGuild == true end

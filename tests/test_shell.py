@@ -28,6 +28,16 @@ class LocaleTest(unittest.TestCase):
         self.assertIn("Commands:", chat)
         self.assertIn("open the Campkeeper window", chat)
 
+    def test_strings_use_only_glyphs_the_client_fonts_have(self):
+        import re
+        allowed = re.compile(r"^[ -~Ѐ-ӿ]*$")  # ASCII + Cyrillic (client fonts lack e.g. · … —)
+        for locale in ("enUS", "ruRU"):
+            env = WowEnv(locale=locale)
+            env.load_toc()
+            table = env.lua.eval('LibStub("AceLocale-3.0"):GetLocale("Campkeeper")')
+            bad = [v for v in table.values() if isinstance(v, str) and not allowed.match(v)]
+            self.assertEqual(bad, [], locale)
+
     def test_every_english_key_has_a_russian_translation(self):
         en, ru = WowEnv(locale="enUS"), WowEnv(locale="ruRU")
         for env in (en, ru):

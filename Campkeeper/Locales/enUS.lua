@@ -37,7 +37,7 @@ L["Your campfire goes out in 1 minute."] = true
 
 -- Camp panel
 L["Camp"] = true
-L["goes out in %s"] = true
+L["Campfire goes out in %s"] = true
 L["Camping cooldown: %s"] = true
 L["placed"] = true
 L["click to place"] = true
@@ -59,3 +59,9 @@ L["guild"] = true
 L["shared channel"] = true
 L["Unconfirmed: reported by one player"] = true
 L["Click: set a waypoint"] = true
+
+-- Sharing
+L["Sharing"] = true
+L["Share camps in the shared channel"] = true
+L["Guild and group sharing always stay on."] = true
+L["Someone uses an incompatible Campkeeper version. Please update the addon."] = true

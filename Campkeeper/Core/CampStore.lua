@@ -172,13 +172,22 @@ local function seenRecord(composition)
            objects = objects, lastSeen = now }
 end
 
+-- Records the player can vouch for (own camp, camp seen first hand) are announced with
+-- CAMP_SHAREABLE(record) so the comm layer can send them.
 function CampStore:Init()
-  local function own(_, camp) CampStore:Add(ownRecord(camp)) end
+  local function own(_, camp)
+    local r = ownRecord(camp)
+    CampStore:Add(r)
+    ns.callbacks:Fire("CAMP_SHAREABLE", r)
+  end
   ns.RegisterCallback(self, "OWN_CAMP_PLACED", own)
   ns.RegisterCallback(self, "OWN_CAMP_UPDATED", own)
   ns.RegisterCallback(self, "CAMP_BENEFITS_PARSED", function(_, composition)
     local r = composition and seenRecord(composition)
-    if r then CampStore:Add(r) end
+    if r then
+      CampStore:Add(r)
+      ns.callbacks:Fire("CAMP_SHAREABLE", r)
+    end
   end)
   self:Prune()
   self.ticker = C_Timer.NewTicker(30, function() CampStore:Prune() end)

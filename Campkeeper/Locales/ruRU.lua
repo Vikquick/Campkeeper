@@ -1,14 +1,14 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Campkeeper", "ruRU")
 if not L then return end
 
-L["Loading..."] = "Загрузка…"
+L["Loading..."] = "Загрузка..."
 
 -- Slash commands
 L["Commands:"] = "Команды:"
-L["/ck - open the Campkeeper window"] = "/ck — открыть окно Campkeeper"
-L["/ck config - open settings"] = "/ck config — открыть настройки"
-L["/ck debug [all||clear] - show the debug log"] = "/ck debug [all||clear] — показать отладочный журнал"
-L["Debug log: %d records"] = "Отладочный журнал: записей — %d"
+L["/ck - open the Campkeeper window"] = "/ck - открыть окно Campkeeper"
+L["/ck config - open settings"] = "/ck config - открыть настройки"
+L["/ck debug [all||clear] - show the debug log"] = "/ck debug [all||clear] - показать отладочный журнал"
+L["Debug log: %d records"] = "Отладочный журнал: записей - %d"
 L["Debug log cleared."] = "Отладочный журнал очищен."
 
 -- Options
@@ -36,7 +36,7 @@ L["Your campfire goes out in 1 minute."] = "Ваш костёр погаснет
 
 -- Camp panel
 L["Camp"] = "Лагерь"
-L["goes out in %s"] = "погаснет через %s"
+L["Campfire goes out in %s"] = "Костёр погаснет через %s"
 L["Camping cooldown: %s"] = "Перезарядка походных предметов: %s"
 L["placed"] = "стоит"
 L["click to place"] = "нажмите, чтобы поставить"
@@ -58,3 +58,9 @@ L["guild"] = "гильдия"
 L["shared channel"] = "общий канал"
 L["Unconfirmed: reported by one player"] = "Не подтверждён: сообщил один игрок"
 L["Click: set a waypoint"] = "Клик: поставить путевую точку"
+
+-- Sharing
+L["Sharing"] = "Обмен"
+L["Share camps in the shared channel"] = "Обмениваться лагерями в общем канале"
+L["Guild and group sharing always stay on."] = "Обмен в гильдии и группе работает всегда."
+L["Someone uses an incompatible Campkeeper version. Please update the addon."] = "У кого-то несовместимая версия Campkeeper. Обновите аддон."

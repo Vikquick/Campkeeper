@@ -1,6 +1,6 @@
 local ADDON_NAME, ns = ...
 
-local Campkeeper = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local Campkeeper = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0")
 ns.addon = Campkeeper
 ns.L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 local L = ns.L
@@ -20,6 +20,7 @@ ns.defaults = {
     panel = { enabled = true },
     minimap = { hide = false },
     alerts = { near = true, gained = true, ending = true, cooldown = true, fire = true },
+    sharing = { channel = true },
   },
 }
 
@@ -32,6 +33,7 @@ function Campkeeper:OnInitialize()
   self.db.global.dbVersion = self.db.global.dbVersion or ns.DB_VERSION
   ns.Log:Attach(self.db.global.debugLog)
   ns.Alerts:AddOptions()
+  ns.Comm:AddOptions()
   ns.Options:Register()
   ns.MinimapButton:Init()
   -- Not /camp: that is the client's built-in logout command and always wins.
@@ -93,6 +95,7 @@ function Campkeeper:OnEnable()
   ns.Professions:ScanAll()
   ns.OwnCamp:UpdateCooldown()
   ns.CampStore:Init()
+  ns.Comm:Init()
   ns.Alerts:Init()
   ns.Panel:Init()
   ns.Pins:Init()

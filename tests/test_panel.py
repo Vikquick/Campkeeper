@@ -122,9 +122,11 @@ class HeaderTest(unittest.TestCase):
         env.mock.AddAura(NEAR)
         env.mock.Cast(1307252)
         env.mock.Cast(LODESTONE_PLACE)
-        self.assertEqual(panel(env).title.text, "Костер подмастерья · 1/5 · погаснет через 10:00")
+        self.assertEqual(panel(env).title.text, "Костер подмастерья  1/5")
+        self.assertEqual(panel(env).fireText.text, "Костёр погаснет через 10:00")
         env.advance(60)
-        self.assertEqual(panel(env).title.text, "Костер подмастерья · 1/5 · погаснет через 9:00")
+        self.assertEqual(panel(env).fireText.text, "Костёр погаснет через 9:00")
+        self.assertTrue(panel(env).fireText.shown)
 
 
 class LogNoiseTest(unittest.TestCase):

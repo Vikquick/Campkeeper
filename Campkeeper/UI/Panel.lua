@@ -11,7 +11,7 @@ ns.Panel = Panel
 local STATUS_TEXT = { placed = "placed", placeable = "click to place", covered = "covered by a class buff" }
 local STATUS_COLOR = { placed = { 0.3, 1, 0.3 }, placeable = { 1, 0.82, 0 }, covered = { 0.6, 0.6, 0.6 } }
 
-local frame, rows, title, cooldownText, bar, barText, hint
+local frame, rows, title, fireText, cooldownText, bar, barText, hint
 local pendingUpdate, hideTimer, hintTimer = false, nil, nil
 
 local function inCombat() return InCombatLockdown() end
@@ -32,12 +32,15 @@ local function createRow(i)
   b.icon = b:CreateTexture(nil, "ARTWORK")
   b.icon:SetSize(16, 16)
   b.icon:SetPoint("LEFT")
-  b.name = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  b.name:SetPoint("LEFT", b.icon, "RIGHT", 4, 0)
-  b.name:SetJustifyH("LEFT")
   b.status = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   b.status:SetPoint("RIGHT")
   b.status:SetJustifyH("RIGHT")
+  b.status:SetWordWrap(false)
+  b.name = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  b.name:SetPoint("LEFT", b.icon, "RIGHT", 4, 0)
+  b.name:SetPoint("RIGHT", b.status, "LEFT", -6, 0)
+  b.name:SetJustifyH("LEFT")
+  b.name:SetWordWrap(false)
   b:SetScript("PreClick", function(self) if self.key then ns.OwnCamp:NoteAttempt(self.key) end end)
   b:SetScript("OnEnter", function(self)
     if not self.key then return end
@@ -79,6 +82,11 @@ local function create()
   title:SetPoint("TOPLEFT", 8, -8)
   title:SetPoint("TOPRIGHT", -8, -8)
   title:SetJustifyH("LEFT")
+  title:SetWordWrap(false)
+
+  fireText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  fireText:SetJustifyH("LEFT")
+  fireText:SetWordWrap(false)
 
   cooldownText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   cooldownText:SetJustifyH("LEFT")
@@ -97,21 +105,17 @@ local function create()
 
   rows = {}
   for i = 1, Panel.MAX_ROWS do rows[i] = createRow(i) end
-  Panel.rows, Panel.frame, Panel.title, Panel.bar, Panel.barText, Panel.hint, Panel.cooldownText =
-    rows, frame, title, bar, barText, hint, cooldownText
+  Panel.rows, Panel.frame, Panel.title, Panel.fireText, Panel.bar, Panel.barText, Panel.hint, Panel.cooldownText =
+    rows, frame, title, fireText, bar, barText, hint, cooldownText
   frame:Hide()
 end
 
+-- Plain ASCII separators only: the client fonts lack glyphs such as the middle dot.
 local function headerText(h)
-  local parts = {}
-  if h.fireTier then
-    parts[1] = ns.Catalog:Name("fire" .. h.fireTier)
-    if h.slots then parts[#parts + 1] = ("%d/%d"):format(h.used, h.slots) end
-    if h.fireRemaining then parts[#parts + 1] = L["goes out in %s"]:format(Util.formatDuration(h.fireRemaining)) end
-  else
-    parts[1] = L["Camp"]
-  end
-  return table.concat(parts, " · ")
+  if not h.fireTier then return L["Camp"] end
+  local text = ns.Catalog:Name("fire" .. h.fireTier)
+  if h.slots then text = ("%s  %d/%d"):format(text, h.used, h.slots) end
+  return text
 end
 
 local function sittingText(s)
@@ -145,6 +149,15 @@ end
 local function render(model)
   title:SetText(headerText(model.header))
   local y = -26
+  if model.header.fireRemaining then
+    fireText:SetText(L["Campfire goes out in %s"]:format(Util.formatDuration(model.header.fireRemaining)))
+    fireText:ClearAllPoints()
+    fireText:SetPoint("TOPLEFT", 8, y)
+    fireText:Show()
+    y = y - 14
+  else
+    fireText:Hide()
+  end
   if model.header.cooldownRemaining and model.header.cooldownRemaining > 0 then
     cooldownText:SetText(L["Camping cooldown: %s"]:format(Util.formatDuration(model.header.cooldownRemaining)))
     cooldownText:ClearAllPoints()
