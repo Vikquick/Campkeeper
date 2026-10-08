@@ -20,3 +20,16 @@ L["Show minimap button"] = "Показывать кнопку у миникар�
 -- Minimap button
 L["Left click: open window"] = "Левый клик: открыть окно"
 L["Right click: settings"] = "Правый клик: настройки"
+
+-- Alerts
+L["Alerts"] = "Оповещения"
+L["Camp nearby"] = "Лагерь рядом"
+L["Benefits received"] = "Бонусы получены"
+L["Benefits ending soon"] = "Бонусы скоро закончатся"
+L["Camping cooldown ready"] = "Походные предметы снова готовы"
+L["Own campfire going out"] = "Свой костёр гаснет"
+L["A camp is nearby: sit by the fire for its benefits."] = "Рядом лагерь: сядьте у костра, чтобы получить бонусы."
+L["Camp benefits received."] = "Бонусы лагеря получены."
+L["Camp benefits end in 5 minutes."] = "Бонусы лагеря закончатся через 5 минут."
+L["Camping items are ready again."] = "Походные предметы снова можно использовать."
+L["Your campfire goes out in 1 minute."] = "Ваш костёр погаснет через 1 минуту."

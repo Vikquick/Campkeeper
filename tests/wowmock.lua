@@ -68,6 +68,7 @@ function strsplit(delims, str, pieces)
   return unpack(out, 1, n)
 end
 
+function strlenutf8(s) local _, n = s:gsub("[^\128-\191]", ""); return n end
 function strjoin(sep, ...) return table.concat({ ... }, sep) end
 function strconcat(...) return table.concat({ ... }) end
 function tostringall(...)
@@ -513,6 +514,57 @@ C_TooltipInfo = {
     return { type = 7, lines = lines }
   end,
 }
+
+------------------------------------------------------------------------
+-- SavedVariables writer (for relog tests)
+------------------------------------------------------------------------
+function Mock.Serialize(v)
+  local t = type(v)
+  if t == "string" then return string.format("%q", v) end
+  if t == "number" or t == "boolean" or t == "nil" then return tostring(v) end
+  local out = {}
+  for k, val in pairs(v) do
+    local key = type(k) == "string" and string.format("[%q]", k) or "[" .. tostring(k) .. "]"
+    out[#out + 1] = key .. " = " .. Mock.Serialize(val)
+  end
+  return "{ " .. table.concat(out, ", ") .. " }"
+end
+
+------------------------------------------------------------------------
+-- Professions, bags, item cooldowns, casts
+------------------------------------------------------------------------
+Mock.professions = {} -- list of { skillLine, rank, max, name } in GetProfessions slot order
+Mock.bags, Mock.knownSpells, Mock.recipes = {}, {}, {}
+Mock.itemCooldown = { start = 0, duration = 0 }
+function GetProfessions()
+  local idx = {}
+  for i = 1, #Mock.professions do idx[i] = i end
+  return unpack(idx, 1, 6)
+end
+function GetProfessionInfo(i)
+  local p = Mock.professions[i]
+  if p then return p.name or "prof", 0, p.rank, p.max or 300, 0, 0, p.skillLine end
+end
+C_Item.GetItemCount = function(id) return Mock.bags[id] or 0 end
+C_Container = {
+  GetItemCooldown = function() return Mock.itemCooldown.start, Mock.itemCooldown.duration, 1 end,
+}
+function IsPlayerSpell(id) return Mock.knownSpells[id] == true end
+C_TradeSkillUI = {
+  GetRecipeInfo = function(id) local r = Mock.recipes[id]; if r ~= nil then return { recipeID = id, learned = r } end end,
+}
+function Mock.Cast(spellID)
+  Mock.Fire("UNIT_SPELLCAST_SENT", "player", "", "Cast-1", spellID)
+  Mock.Fire("UNIT_SPELLCAST_SUCCEEDED", "player", "Cast-1", spellID)
+end
+
+-- Alerts
+Mock.raidNotices, Mock.sounds = {}, {}
+RaidWarningFrame = CreateFrame("Frame", "RaidWarningFrame", UIParent)
+ChatTypeInfo = { RAID_WARNING = { r = 1, g = 0.3, b = 0.1 } }
+function RaidNotice_AddMessage(_, text) table.insert(Mock.raidNotices, text) end
+SOUNDKIT = { RAID_WARNING = 8959 }
+function PlaySound(id) table.insert(Mock.sounds, id) end
 
 ------------------------------------------------------------------------
 -- Settings panel (AceConfigDialog:AddToBlizOptions)

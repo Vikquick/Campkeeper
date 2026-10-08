@@ -62,6 +62,7 @@ function CampState:Rebuild()
   info.near = near ~= false
   info.sittingExpires = sitting and sitting.expirationTime or nil
   info.benefitsExpires = benefits and benefits.expirationTime or nil
+  info.benefitsDuration = benefits and benefits.duration or nil
   info.benefitsInstanceID = benefitsID
   if benefitsChanged then info.benefits = nil end -- composition of a new aura is parsed again
 

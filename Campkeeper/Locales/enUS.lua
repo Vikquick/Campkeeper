@@ -21,3 +21,16 @@ L["Show minimap button"] = true
 -- Minimap button
 L["Left click: open window"] = true
 L["Right click: settings"] = true
+
+-- Alerts
+L["Alerts"] = true
+L["Camp nearby"] = true
+L["Benefits received"] = true
+L["Benefits ending soon"] = true
+L["Camping cooldown ready"] = true
+L["Own campfire going out"] = true
+L["A camp is nearby: sit by the fire for its benefits."] = true
+L["Camp benefits received."] = true
+L["Camp benefits end in 5 minutes."] = true
+L["Camping items are ready again."] = true
+L["Your campfire goes out in 1 minute."] = true

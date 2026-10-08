@@ -19,6 +19,9 @@ Data\Catalog.lua
 Core\Catalog.lua
 Core\CampState.lua
 Core\BenefitsParser.lua
+Core\Professions.lua
+Core\OwnCamp.lua
 
 UI\Options.lua
 UI\Minimap.lua
+UI\Alerts.lua

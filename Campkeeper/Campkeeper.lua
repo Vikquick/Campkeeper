@@ -12,11 +12,13 @@ ns.DB_VERSION = 1
 ns.defaults = {
   global = {
     debugLog = {},
+    chars = {},
   },
   char = {},
   profile = {
     panel = { enabled = true },
     minimap = { hide = false },
+    alerts = { near = true, gained = true, ending = true, cooldown = true, fire = true },
   },
 }
 
@@ -28,6 +30,7 @@ function Campkeeper:OnInitialize()
   -- Not a default: AceDB strips defaults on logout, and migrations need the stored value.
   self.db.global.dbVersion = self.db.global.dbVersion or ns.DB_VERSION
   ns.Log:Attach(self.db.global.debugLog)
+  ns.Alerts:AddOptions()
   ns.Options:Register()
   ns.MinimapButton:Init()
   -- Not /camp: that is the client's built-in logout command and always wins.
@@ -36,23 +39,59 @@ function Campkeeper:OnInitialize()
   ns.callbacks:Fire("INITIALIZED")
 end
 
+local function onUnitEvent(_, event, _, ...)
+  if event == "UNIT_AURA" then
+    ns.CampState:OnUnitAura((...))
+  elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+    local _, spellID = ...
+    ns.OwnCamp:OnSpellSucceeded(spellID)
+  elseif event == "UNIT_SPELLCAST_SENT" then
+    local _, _, spellID = ...
+    local placed = ns.Catalog:ByPlaceSpell(spellID)
+    if placed then ns.OwnCamp:NoteAttempt(placed.key) end
+  end
+end
+
 -- Client events -> Core modules. Core never touches frames; this is the only wiring point.
 function Campkeeper:OnEnable()
   self:RegisterEvent("ITEM_DATA_LOAD_RESULT", function(_, itemID, success) ns.Catalog:OnItemLoaded(itemID, success) end)
   self:RegisterEvent("SPELL_DATA_LOAD_RESULT", function(_, spellID, success) ns.Catalog:OnSpellLoaded(spellID, success) end)
 
-  local auraFrame = CreateFrame("Frame")
-  auraFrame:RegisterUnitEvent("UNIT_AURA", "player")
-  auraFrame:SetScript("OnEvent", function(_, _, _, updateInfo) ns.CampState:OnUnitAura(updateInfo) end)
-  self.auraFrame = auraFrame
+  local unitFrame = CreateFrame("Frame")
+  unitFrame:RegisterUnitEvent("UNIT_AURA", "player")
+  unitFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+  unitFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player")
+  unitFrame:SetScript("OnEvent", onUnitEvent)
+  self.unitFrame = unitFrame
+
   self:RegisterEvent("PLAYER_REGEN_ENABLED", function() ns.CampState:OnCombatEnded() end)
-  self:RegisterEvent("PLAYER_ENTERING_WORLD", function() ns.CampState:Rebuild() end)
+  self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
+    ns.CampState:Rebuild()
+    ns.Professions:ScanAll()
+    ns.OwnCamp:UpdateCooldown()
+  end)
+  self:RegisterEvent("UI_ERROR_MESSAGE", function(_, errorType) ns.OwnCamp:OnUIError(errorType) end)
+  self:RegisterEvent("BAG_UPDATE_DELAYED", function()
+    ns.Professions:ScanBags()
+    ns.OwnCamp:UpdateCooldown()
+  end)
+  self:RegisterEvent("BAG_UPDATE_COOLDOWN", function() ns.OwnCamp:UpdateCooldown() end)
+  self:RegisterEvent("SKILL_LINES_CHANGED", function() ns.Professions:ScanProfessions() end)
+  self:RegisterEvent("TRADE_SKILL_SHOW", function() ns.Professions:ScanRecipes(true) end)
+  self:RegisterEvent("TRADE_SKILL_LIST_UPDATE", function() ns.Professions:ScanRecipes(true) end)
+  self:RegisterEvent("NEW_RECIPE_LEARNED", function() ns.Professions:ScanRecipes(false) end)
 
   ns.RegisterCallback(self, "CAMP_BENEFITS_GAINED", function(_, instanceID)
     ns.BenefitsParser:Parse(instanceID, function(composition) ns.CampState:SetBenefits(instanceID, composition) end)
   end)
+  ns.RegisterCallback(self, "CAMP_BENEFITS_PARSED", function(_, composition, info)
+    ns.OwnCamp:OnBenefitsParsed(composition, info)
+  end)
 
   ns.CampState:Rebuild()
+  ns.Professions:ScanAll()
+  ns.OwnCamp:UpdateCooldown()
+  ns.Alerts:Init()
   ns.callbacks:Fire("ENABLED")
 end
 

@@ -71,7 +71,56 @@ ns.api = {
   spellDescription = wrap("C_Spell.GetSpellDescription", function() return C_Spell and C_Spell.GetSpellDescription end),
   requestSpell = wrap("C_Spell.RequestLoadSpellData", function() return C_Spell and C_Spell.RequestLoadSpellData end),
   after = function(seconds, fn) C_Timer.After(seconds, fn) end,
+  -- cancellable: returns a handle with :Cancel()
+  timer = function(seconds, fn) return C_Timer.NewTimer(math.max(0, seconds), fn) end,
+  itemCount = wrap("C_Item.GetItemCount", function() return C_Item and C_Item.GetItemCount end),
+  itemCooldown = wrap("C_Container.GetItemCooldown", function() return C_Container and C_Container.GetItemCooldown end),
+  isPlayerSpell = wrap("IsPlayerSpell", function() return IsPlayerSpell end),
 }
+
+-- Professions as { [skillLineID] = { skill = n, max = n, name = s } }, or nil when unavailable.
+function ns.api.professions()
+  if not GetProfessions then return nil end
+  local ok, p1, p2, p3, p4, p5, p6 = pcall(GetProfessions)
+  if not ok then
+    ns.log("api", "GetProfessions: %s", tostring(p1))
+    return nil
+  end
+  local out = {}
+  for _, index in pairs({ p1, p2, p3, p4, p5, p6 }) do -- slots are nil when not learned
+    local name, _, rank, maxRank, _, _, skillLine = Util.safeCall("GetProfessionInfo", GetProfessionInfo, index)
+    if skillLine then out[skillLine] = { skill = rank, max = maxRank, name = name } end
+  end
+  return out
+end
+
+-- Whether a recipe (craft spell) is learned, from the open profession window; nil if unknown.
+function ns.api.recipeLearned(recipeID)
+  local info = Util.safeCall("C_TradeSkillUI.GetRecipeInfo", C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo, recipeID)
+  if info == nil then return nil end
+  return info.learned == true
+end
+
+local HBD = LibStub and LibStub("HereBeDragons-2.0", true)
+
+-- Player position: map coordinates for display and world coordinates for distances.
+function ns.api.playerPosition()
+  local mapID = Util.safeCall("C_Map.GetBestMapForUnit", C_Map and C_Map.GetBestMapForUnit, "player")
+  local pos = mapID and Util.safeCall("C_Map.GetPlayerMapPosition", C_Map.GetPlayerMapPosition, mapID, "player")
+  local wx, wy, instance
+  if HBD then wx, wy, instance = HBD:GetPlayerWorldPosition() end
+  if not mapID then return nil end
+  local x, y = nil, nil
+  if pos then x, y = pos:GetXY() end
+  return { mapID = mapID, x = x, y = y, wx = wx, wy = wy, instance = instance }
+end
+
+-- Distance in yards between two positions from playerPosition() (nil across instances).
+function ns.api.distance(a, b)
+  if not (a and b and a.wx and b.wx) or a.instance ~= b.instance then return nil end
+  local dx, dy = a.wx - b.wx, a.wy - b.wy
+  return math.sqrt(dx * dx + dy * dy)
+end
 
 -- Player aura by spell ID as a plain copy: table if present, false if absent,
 -- nil if it cannot be read right now (API error or secret values in combat).

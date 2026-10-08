@@ -97,6 +97,21 @@ class WowEnv:
         self.fire("PLAYER_ENTERING_WORLD", True, False)
         self.advance(0)
 
+    def relog(self, after_seconds=0, prepare=""):
+        """Log out (AceDB strips defaults), then start a fresh client with the same SavedVariables,
+        the clock moved forward by after_seconds. `prepare` runs before the addon loads."""
+        self.fire("PLAYER_LOGOUT")
+        saved = self.mock.Serialize(self.g.CampkeeperDB)
+        env = WowEnv(locale=self.mock.locale, addon=self.addon)
+        env.mock.time = self.mock.time + after_seconds
+        env.mock.serverTime = self.mock.serverTime + after_seconds
+        env.lua.execute("CampkeeperDB = " + saved)
+        env.lua.execute(prepare)
+        env.load_toc()
+        env.login()
+        env.assert_no_errors()
+        return env
+
     def errors(self):
         return list(self.mock.errors.values())
 
