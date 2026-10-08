@@ -1,0 +1,42 @@
+name: Test, package and release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install lupa
+        run: pip install lupa
+      - name: Fetch embedded libraries
+        run: python tools/fetch_libs.py
+      - name: Check .toc references
+        run: python tools/toc.py Campkeeper/Campkeeper.toc --check
+      - name: Unit tests
+        run: python -m unittest discover tests
+
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Subversion (SVN externals in .pkgmeta)
+        run: sudo apt-get update && sudo apt-get install -y subversion
+      # Uploads happen only for the IDs present in the .toc (## X-Curse-Project-ID, ## X-Wago-ID)
+      # and only when the matching secret is set; otherwise the zip is attached to the GitHub release.
+      - uses: BigWigsMods/packager@v2

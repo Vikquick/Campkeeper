@@ -1,5 +1,19 @@
 package-as: Campkeeper
 
+# The addon lives in a subfolder (like WeakAuras2): only Campkeeper/ goes into the zip.
+move-folders:
+  Campkeeper/Campkeeper: Campkeeper
+
+ignore:
+  - ForeverApiDump
+  - tools
+  - tests
+  - docs
+  - openspec
+  - out
+  - .claude
+  - README.md
+
 externals:
   Campkeeper/Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
   Campkeeper/Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
