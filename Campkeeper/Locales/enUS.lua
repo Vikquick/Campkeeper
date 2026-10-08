@@ -6,9 +6,9 @@ L["Loading..."] = true
 
 -- Slash commands
 L["Commands:"] = true
-L["/camp - open the Campkeeper window"] = true
-L["/camp config - open settings"] = true
-L["/camp debug [all||clear] - show the debug log"] = true
+L["/ck - open the Campkeeper window"] = true
+L["/ck config - open settings"] = true
+L["/ck debug [all||clear] - show the debug log"] = true
 L["Debug log: %d records"] = true
 L["Debug log cleared."] = true
 

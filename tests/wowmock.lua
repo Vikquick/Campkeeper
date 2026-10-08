@@ -553,7 +553,7 @@ function SendChatMessage(msg, chatType, _, target)
   table.insert(Mock.sent, { kind = "chat", msg = msg, chatType = chatType, target = target })
 end
 
--- Run a slash command line such as "/camp debug".
+-- Run a slash command line such as "/ck debug".
 function Mock.Slash(line)
   local cmd, rest = line:match("^(/%S+)%s*(.-)$")
   cmd = cmd:upper()

@@ -72,7 +72,7 @@ python -m unittest discover tests
 New-Item -ItemType Junction -Path "E:\wow\World of Warcraft\_classic_beta_\Interface\AddOns\Campkeeper" -Target "C:\Users\vvvvi\addon\Campkeeper"
 ```
 
-В игре: `/camp` — окно, `/camp config` — настройки, `/camp debug [all|clear]` — отладочный журнал (последние 200 записей, хранится в `CampkeeperDB`).
+В игре: `/ck` (или `/campkeeper`) — окно, `/ck config` — настройки, `/ck debug [all|clear]` — отладочный журнал (последние 200 записей, хранится в `CampkeeperDB`). Команду `/camp` занять нельзя: это встроенный выход из игры.
 
 ### Каталог лагерей после патча
 

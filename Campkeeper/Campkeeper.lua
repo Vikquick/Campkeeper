@@ -29,7 +29,9 @@ function Campkeeper:OnInitialize()
   self.db.global.dbVersion = self.db.global.dbVersion or ns.DB_VERSION
   ns.Log:Attach(self.db.global.debugLog)
   ns.Options:Register()
-  self:RegisterChatCommand("camp", "ChatCommand")
+  -- Not /camp: that is the client's built-in logout command and always wins.
+  self:RegisterChatCommand("ck", "ChatCommand")
+  self:RegisterChatCommand("campkeeper", "ChatCommand")
   ns.callbacks:Fire("INITIALIZED")
 end
 
@@ -55,9 +57,9 @@ end
 
 function Campkeeper:PrintHelp()
   self:Print(L["Commands:"])
-  self:Print(L["/camp - open the Campkeeper window"])
-  self:Print(L["/camp config - open settings"])
-  self:Print(L["/camp debug [all||clear] - show the debug log"])
+  self:Print(L["/ck - open the Campkeeper window"])
+  self:Print(L["/ck config - open settings"])
+  self:Print(L["/ck debug [all||clear] - show the debug log"])
 end
 
 function Campkeeper:PrintDebugLog(all)
