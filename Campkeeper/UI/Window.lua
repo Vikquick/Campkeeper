@@ -76,4 +76,8 @@ function Window:Init()
   for _, event in ipairs({ "CATALOG_UPDATED", "PROFESSIONS_UPDATED", "CAMP_COOLDOWN_UPDATED" }) do
     ns.RegisterCallback(self, event, refresh)
   end
+  -- tabs with timers (LIVE) tick once a second while the window is open
+  self.ticker = C_Timer.NewTicker(1, function()
+    if Window:IsShown() and ns[TABS[Window.current][1]].LIVE then refresh() end
+  end)
 end

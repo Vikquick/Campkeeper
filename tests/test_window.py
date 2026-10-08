@@ -130,10 +130,20 @@ class AltsTabTest(unittest.TestCase):
             "AddLine": lambda self, text, *a: lines.append(text),
             "AddDoubleLine": lambda self, left, right, *a: lines.append(f"{left}: {right}"),
         })
-        env.fire_callback = None
         env.lua.eval('function(ns, tt) ns.callbacks:Fire("MINIMAP_TOOLTIP", tt) end')(env.ns, tooltip)
         self.assertEqual(lines, ["Перезарядка походных предметов", "Tester: 12:30", "Alt: готово"])
-        env.ns.Window.Show(env.ns.Window, 3)
+        w = env.ns.Window
+        w.Show(w, 3)
+        self.assertTrue(w.contents[3].shown)
+        env.assert_no_errors()
+
+    def test_cooldown_counts_down_while_open(self):
+        env = started("Mock.bags[279960] = 1; Mock.itemCooldown = { start = Mock.time, duration = 750 }")
+        w = env.ns.Window
+        w.Show(w, 3)
+        self.assertEqual(env.ns.AltsTab.lastCooldownText, "Перезарядка походных предметов: 12:30")
+        env.advance(5)
+        self.assertEqual(env.ns.AltsTab.lastCooldownText, "Перезарядка походных предметов: 12:25")
         env.assert_no_errors()
 
 

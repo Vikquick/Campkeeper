@@ -4,7 +4,8 @@ local Util = ns.Util
 
 -- Alts tab: every character of the account with professions, camp items, recipes, blueprints and
 -- the shared cooldown. Also feeds the minimap button tooltip.
-local AltsTab = { ROWS = 12, ROW_HEIGHT = 32 }
+-- LIVE: the window refreshes this tab every second (cooldown timers).
+local AltsTab = { ROWS = 9, ROW_HEIGHT = 46, LIVE = true }
 ns.AltsTab = AltsTab
 
 local function cooldownText(c)
@@ -55,13 +56,16 @@ function AltsTab:Create(parent)
       name = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal"),
       cooldown = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlight"),
       details = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"),
+      recipes = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"),
     }
     l.name:SetPoint("TOPLEFT", 0, y)
     l.cooldown:SetPoint("TOPRIGHT", 0, y)
-    l.details:SetPoint("TOPLEFT", 12, y - 14)
-    l.details:SetPoint("RIGHT")
-    l.details:SetJustifyH("LEFT")
-    l.details:SetWordWrap(false)
+    for n, fs in ipairs({ l.details, l.recipes }) do
+      fs:SetPoint("TOPLEFT", 12, y - 2 - n * 13)
+      fs:SetPoint("RIGHT")
+      fs:SetJustifyH("LEFT")
+      fs:SetWordWrap(false)
+    end
     lines[i] = l
   end
 end
@@ -75,9 +79,9 @@ function AltsTab:Refresh()
       l.name:SetText(("%s - %s"):format(r.name or "?", r.realm or "?"))
       if color then l.name:SetTextColor(color.r, color.g, color.b) end
       l.cooldown:SetText(L["Camping cooldown: %s"]:format(r.cooldown))
-      l.details:SetText(L["%s / camp items: %d / recipes: %s / blueprints: %s"]:format(
-        r.professions ~= "" and r.professions or L["no professions"], r.items,
-        r.recipes ~= "" and r.recipes or "-", r.blueprints))
+      if i == 1 then self.lastCooldownText = l.cooldown:GetText() end
+      l.details:SetText(L["%s / camp items: %d"]:format(r.professions ~= "" and r.professions or L["no professions"], r.items))
+      l.recipes:SetText(L["Recipes: %s / blueprints: %s"]:format(r.recipes ~= "" and r.recipes or "-", r.blueprints))
       for _, fs in pairs(l) do fs:Show() end
     else
       for _, fs in pairs(l) do fs:Hide() end
