@@ -77,6 +77,25 @@ class DebugCommandTest(unittest.TestCase):
         env.mock.Slash("/campkeeper help")
         env.assert_no_errors()
 
+    def test_minimap_button_registered_and_hideable(self):
+        env = started()
+        dbicon = env.lua.eval('(LibStub("LibDBIcon-1.0"))')
+        self.assertTrue(dbicon.IsRegistered(dbicon, "Campkeeper"))
+        button = dbicon.GetMinimapButton(dbicon, "Campkeeper")
+        self.assertTrue(button.shown)
+
+        opts = env.lua.eval('LibStub("AceConfigRegistry-3.0"):GetOptionsTable("Campkeeper", "dialog", "x-1")')
+        opts.args.general.args.minimap.set(None, False)
+        self.assertFalse(button.shown)
+        self.assertTrue(env.lua.eval('LibStub("AceAddon-3.0"):GetAddon("Campkeeper").db.profile.minimap.hide'))
+        opts.args.general.args.minimap.set(None, True)
+        self.assertTrue(button.shown)
+
+        # left click opens settings while there is no window yet
+        env.lua.eval('LibStub("LibDataBroker-1.1"):GetDataObjectByName("Campkeeper").OnClick(nil, "LeftButton")')
+        self.assertIsNotNone(env.lua.eval('LibStub("AceConfigDialog-3.0").OpenFrames["Campkeeper"]'))
+        env.assert_no_errors()
+
     def test_config_command_opens_dialog(self):
         env = started()
         env.mock.Slash("/ck config")

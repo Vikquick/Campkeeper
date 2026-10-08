@@ -29,6 +29,7 @@ function Campkeeper:OnInitialize()
   self.db.global.dbVersion = self.db.global.dbVersion or ns.DB_VERSION
   ns.Log:Attach(self.db.global.debugLog)
   ns.Options:Register()
+  ns.MinimapButton:Init()
   -- Not /camp: that is the client's built-in logout command and always wins.
   self:RegisterChatCommand("ck", "ChatCommand")
   self:RegisterChatCommand("campkeeper", "ChatCommand")

@@ -16,3 +16,7 @@ L["General"] = "Общие"
 L["Show camp panel"] = "Показывать панель лагеря"
 L["Show the camp panel next to your buffs while you are near a camp."] = "Показывать панель лагеря рядом с баффами, когда вы у лагеря."
 L["Show minimap button"] = "Показывать кнопку у миникарты"
+
+-- Minimap button
+L["Left click: open window"] = "Левый клик: открыть окно"
+L["Right click: settings"] = "Правый клик: настройки"

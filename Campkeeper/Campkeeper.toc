@@ -21,3 +21,4 @@ Core\CampState.lua
 Core\BenefitsParser.lua
 
 UI\Options.lua
+UI\Minimap.lua

@@ -17,3 +17,7 @@ L["General"] = true
 L["Show camp panel"] = true
 L["Show the camp panel next to your buffs while you are near a camp."] = true
 L["Show minimap button"] = true
+
+-- Minimap button
+L["Left click: open window"] = true
+L["Right click: settings"] = true
