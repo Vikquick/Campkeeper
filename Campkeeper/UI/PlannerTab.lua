@@ -1,22 +1,16 @@
 local _, ns = ...
 local L = ns.L
 
--- Planner tab: group members with professions (own data, PROF messages from their Campkeeper,
--- or entered by hand), fire tier and role -> plan, and a button that posts it to group chat.
-local PlannerTab = { PROF_DELAY = 3, MAX_PLAN_LINES = 12, MAX_MEMBERS = 8 }
+-- Planner tab: group members with professions (own data and PROF messages from their Campkeeper;
+-- members without the addon are listed but not planned), fire tier and role -> plan, and a button
+-- that posts it to group chat.
+local PlannerTab = { PROF_DELAY = 3, MAX_PLAN_LINES = 12, MAX_MEMBERS = 10 }
 ns.PlannerTab = PlannerTab
 
 local ROLE_LABEL = { leveling = "Leveling", dungeon = "Dungeon", craft = "Crafting" }
-local received, manual = {}, {} -- [name] = { [professionKey] = skill }
-local state = { role = "leveling", fireTier = 1 } -- + memberName, professionKey (manual entry)
+local received = {} -- [name] = { [professionKey] = skill } from PROF messages
+local state = { role = "leveling", fireTier = 1 }
 local ui = {}
-
-local function professionKeys()
-  local keys = {}
-  for key in pairs(ns.CatalogData.professions) do keys[#keys + 1] = key end
-  table.sort(keys)
-  return keys
-end
 
 local skillLineToKey
 local function keyForSkillLine(id)
@@ -38,11 +32,6 @@ function PlannerTab:OnProfessions(name, payload)
   if ns.Window:IsShown() then self:Refresh() end
 end
 
-function PlannerTab:SetManual(name, professionKey, skill)
-  manual[name] = manual[name] or {}
-  manual[name][professionKey] = skill
-end
-
 local function groupUnits()
   local units = { "player" }
   if IsInRaid() then
@@ -54,7 +43,7 @@ local function groupUnits()
   return units
 end
 
--- Planner input members: { name, class, professions, source = "self"|"addon"|"manual"|"none" }.
+-- Group members: { name, class, professions, source = "self"|"addon"|"none" }.
 function PlannerTab:Members()
   local me = UnitName("player")
   local out = {}
@@ -70,7 +59,6 @@ function PlannerTab:Members()
         for key, skill in pairs(received[name]) do profs[key] = skill end
         source = "addon"
       end
-      for key, skill in pairs(manual[name] or {}) do profs[key] = skill; if source == "none" then source = "manual" end end
       out[#out + 1] = { name = name, class = class, professions = profs, source = source }
     end
   end
@@ -78,6 +66,7 @@ function PlannerTab:Members()
 end
 
 function PlannerTab:Plan()
+  -- everyone counts for class buffs; members without Campkeeper have no professions, so they get nothing
   return ns.Planner:Plan({ members = self:Members(), fireTier = state.fireTier, role = state.role })
 end
 
@@ -102,17 +91,25 @@ function PlannerTab:Notes(plan)
   if not plan.fire then
     notes[#notes + 1] = L["Nobody can light this fire (Cooking %d)"]:format(ns.Catalog:Fire(state.fireTier).skill)
   end
+  local members = self:Members()
+  local known = 0
+  for _, m in ipairs(members) do if m.source ~= "none" then known = known + 1 end end
   if #plan.objects < plan.slots then
-    if plan.members <= 1 then
+    if #members <= 1 then
       notes[#notes + 1] = L["You are alone: other objects need more group members."]
     else
       local used = #plan.objects + (plan.fire and 1 or 0)
-      if used >= plan.members then
+      if used >= known then
         notes[#notes + 1] = L["Every member already places something; more members would fill the free places."]
       else
         notes[#notes + 1] = L["The remaining members have no profession skill for the other objects."]
       end
     end
+  end
+  local unknown = {}
+  for _, m in ipairs(members) do if m.source == "none" then unknown[#unknown + 1] = m.name end end
+  if #unknown > 0 then
+    notes[#notes + 1] = L["Without Campkeeper: %s - their professions are unknown and not planned."]:format(table.concat(unknown, ", "))
   end
   if #plan.covered > 0 then
     local names = {}
@@ -176,46 +173,7 @@ local function radios(parent, x, y, options, get, set)
   return group
 end
 
--- Dropdown with the modern menu API; falls back to a button that cycles through the values.
-local function dropdown(parent, width, values, get, set)
-  local ok, dd = pcall(CreateFrame, "DropdownButton", nil, parent, "WowStyle1DropdownTemplate")
-  if ok and dd and type(dd.SetupMenu) == "function" then
-    dd:SetWidth(width)
-    dd.Rebuild = function()
-      dd:SetupMenu(function(_, root)
-        for _, v in ipairs(values()) do
-          root:CreateRadio(v[2], function() return get() == v[1] end, function() set(v[1]); PlannerTab:Refresh() end)
-        end
-      end)
-    end
-    return dd
-  end
-  local b = button(parent, "", width, function()
-    local list = values()
-    local index = 1
-    for i, v in ipairs(list) do if v[1] == get() then index = i end end
-    if #list > 0 then set(list[index % #list + 1][1]) end
-    PlannerTab:Refresh()
-  end)
-  b.Rebuild = function()
-    for _, v in ipairs(values()) do if v[1] == get() then b:SetText(v[2]) end end
-  end
-  return b
-end
-
-local SOURCE = { self = "you", addon = "via Campkeeper", manual = "entered by hand", none = "no Campkeeper" }
-
-local function memberValues()
-  local out = {}
-  for _, m in ipairs(PlannerTab:Members()) do out[#out + 1] = { m.name, m.name } end
-  return out
-end
-
-local function professionValues()
-  local out = {}
-  for _, key in ipairs(professionKeys()) do out[#out + 1] = { key, L[ns.CatalogTab.PROFESSION_NAMES[key]] } end
-  return out
-end
+local SOURCE = { self = "you", addon = "via Campkeeper", none = "no Campkeeper" }
 
 function PlannerTab:Create(parent)
   label(parent, L["Who places what in the group camp"], "GameFontNormalLarge", 0, 0)
@@ -240,51 +198,11 @@ function PlannerTab:Create(parent)
     local row = {
       name = label(parent, "", "GameFontHighlight", 0, y, 240),
       profs = label(parent, "", "GameFontDisableSmall", 12, y - 14, RIGHT - 24),
-      edit = button(parent, L["set professions"], 120),
     }
     row.name:SetWordWrap(false)
     row.profs:SetWordWrap(false)
-    row.edit:SetPoint("TOPLEFT", 250, y + 3)
-    row.edit:SetHeight(18)
-    row.edit:SetScript("OnClick", function()
-      state.memberName = row.memberName
-      ui.skill:SetFocus()
-      PlannerTab:Refresh()
-    end)
     ui.members[i] = row
   end
-
-  local y = -128 - self.MAX_MEMBERS * ROW
-  label(parent, L["Set a profession by hand (for members without Campkeeper):"], "GameFontNormal", 0, y)
-  y = y - 20
-  label(parent, L["Member"], "GameFontHighlightSmall", 0, y - 5)
-  ui.memberDropdown = dropdown(parent, 130, memberValues,
-    function() return state.memberName end, function(v) state.memberName = v end)
-  ui.memberDropdown:SetPoint("TOPLEFT", 60, y)
-  label(parent, L["Profession"], "GameFontHighlightSmall", 200, y - 5)
-  ui.professionDropdown = dropdown(parent, 150, professionValues,
-    function() return state.professionKey end, function(v) state.professionKey = v end)
-  ui.professionDropdown:SetPoint("TOPLEFT", 270, y)
-  ui.skill = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
-  ui.skill:SetSize(50, 22)
-  ui.skill:SetAutoFocus(false)
-  ui.skill:SetNumeric(true)
-  ui.skill:SetMaxLetters(3)
-  ui.skill:SetPoint("TOPLEFT", 434, y)
-  ui.skillHint = ui.skill:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-  ui.skillHint:SetPoint("LEFT", 4, 0)
-  ui.skillHint:SetText(L["skill"])
-  ui.skill:SetScript("OnTextChanged", function(self) ui.skillHint:SetShown(self:GetText() == "") end)
-  ui.add = button(parent, L["Add"], 90, function()
-    local skill = tonumber(ui.skill:GetText())
-    if state.memberName and state.professionKey and skill then
-      PlannerTab:SetManual(state.memberName, state.professionKey, math.min(skill, 450))
-      ui.skill:SetText("")
-      ui.skill:ClearFocus()
-      PlannerTab:Refresh()
-    end
-  end)
-  ui.add:SetPoint("TOPLEFT", 494, y)
 
   label(parent, L["Plan"], "GameFontNormal", RIGHT, -102)
   ui.plan = {}
@@ -315,24 +233,14 @@ function PlannerTab:Refresh()
       row.memberName = m.name
       row.name:SetText(("%s (%s)"):format(m.name, L[SOURCE[m.source]]))
       row.profs:SetText(#profs > 0 and table.concat(profs, ", ") or L["no professions known"])
-      row.edit:SetShown(m.source ~= "self")
       row.name:Show()
       row.profs:Show()
     else
       row.memberName = nil
       row.name:Hide()
       row.profs:Hide()
-      row.edit:Hide()
     end
   end
-
-  -- keep the manual-entry selection valid
-  local valid = false
-  for _, m in ipairs(members) do if m.name == state.memberName then valid = true end end
-  if not valid then state.memberName = members[1] and members[1].name end
-  state.professionKey = state.professionKey or professionKeys()[1]
-  ui.memberDropdown.Rebuild()
-  ui.professionDropdown.Rebuild()
 
   local plan = self:Plan()
   local lines = self:PlanLines(plan)

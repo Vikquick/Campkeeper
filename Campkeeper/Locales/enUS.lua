@@ -101,11 +101,9 @@ L["Leveling"] = true
 L["Dungeon"] = true
 L["Crafting"] = true
 L["%d slots"] = true
-L["Add"] = true
 L["Plan"] = true
 L["you"] = true
 L["via Campkeeper"] = true
-L["entered by hand"] = true
 L["Nobody can light this fire (Cooking %d)"] = true
 
 -- Planner tab
@@ -115,13 +113,9 @@ L["Goal:"] = true
 L["Campfire:"] = true
 L["%s, %d places"] = true
 L["Members"] = true
-L["set professions"] = true
 L["no Campkeeper"] = true
 L["no professions known"] = true
-L["Set a profession by hand (for members without Campkeeper):"] = true
-L["Member"] = true
-L["Profession"] = true
-L["skill"] = true
+L["Without Campkeeper: %s - their professions are unknown and not planned."] = true
 L["Post the plan to group chat"] = true
 L["You are alone: other objects need more group members."] = true
 L["Every member already places something; more members would fill the free places."] = true

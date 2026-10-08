@@ -59,6 +59,13 @@ class CatalogTabTest(unittest.TestCase):
         env.assert_no_errors()
 
 
+def send_professions(env, sender, professions):
+    """A group member's Campkeeper reports professions ({skillLineID: skill}) in party chat."""
+    text = env.ns.Protocol.Encode(env.ns.Protocol, env.lua.table_from(
+        {"v": 1, "t": "PROF", "p": env.lua.table_from(professions)}))
+    env.fire("CHAT_MSG_ADDON", PREFIX, text, "PARTY", sender + "-Realm")
+
+
 class PlannerTabTest(unittest.TestCase):
     def setUp(self):
         self.env = started('Mock.inGroup = true\nMock.group = { { name = "Bob", class = "PALADIN" }, { name = "Kim", class = "ROGUE" } }')
@@ -67,25 +74,20 @@ class PlannerTabTest(unittest.TestCase):
     def members(self):
         return {m.name: m for m in self.tab.Members(self.tab).values()}
 
-    def test_members_from_group_addon_and_manual(self):
+    def test_members_from_group_and_addon(self):
         env = self.env
         m = self.members()
         self.assertEqual(sorted(m), ["Bob", "Kim", "Tester"])
         self.assertEqual((m["Tester"].source, m["Tester"].professions.mining), ("self", 300))
         self.assertEqual(m["Bob"].source, "none")
-        prof = env.ns.Protocol.Encode(env.ns.Protocol, env.lua.table_from(
-            {"v": 1, "t": "PROF", "p": env.lua.table_from({186: 150, 164: 300, 9999: 5})}))
-        env.fire("CHAT_MSG_ADDON", PREFIX, prof, "PARTY", "Bob-Realm")
+        send_professions(env, "Bob", {186: 150, 164: 300, 9999: 5})
         bob = self.members()["Bob"]
         self.assertEqual((bob.source, bob.professions.mining, bob.professions.blacksmithing), ("addon", 150, 300))
-        self.tab.SetManual(self.tab, "Kim", "fishing", 225)
-        kim = self.members()["Kim"]
-        self.assertEqual((kim.source, kim.professions.fishing), ("manual", 225))
         env.assert_no_errors()
 
     def test_plan_to_group_chat(self):
         env = self.env
-        self.tab.SetManual(self.tab, "Kim", "cooking", 10)
+        send_professions(env, "Kim", {185: 10})
         env.ns.Window.Show(env.ns.Window, 2)
         self.tab.PostToChat(self.tab)
         chat = [s for s in env.mock.sent.values() if s.kind == "chat"]
@@ -133,23 +135,23 @@ class PlannerTabUiTest(unittest.TestCase):
         self.assertEqual(tab.lastPlan.slots, 10)
         self.assertEqual(list(tab.lastNotes.values())[0], "Этот костёр некому развести (Кулинария 220)")
 
-    def test_manual_entry_and_covered_note(self):
+    def test_members_without_addon_and_covered_note(self):
         env, tab = self.open('Mock.inGroup = true\nMock.group = { { name = "Bob", class = "PALADIN" }, '
                              '{ name = "Kim", class = "ROGUE" } }')
-        ui = tab.ui
-        rows = list(ui.members.values())
+        rows = list(tab.ui.members.values())
         kim = next(r for r in rows if r.memberName == "Kim")
-        self.assertEqual(kim.name.text, "Kim (нет Campkeeper)")
-        self.assertTrue(kim.edit.shown)
-        kim.edit.scripts.OnClick(kim.edit)  # "set professions" selects Kim for manual entry
-        ui.professionDropdown.scripts.OnClick(ui.professionDropdown)  # fallback dropdown cycles: alchemy -> blacksmithing
-        ui.skill.text = "150"
-        ui.add.scripts.OnClick(ui.add)
-        kim = next(r for r in list(ui.members.values()) if r.memberName == "Kim")
-        self.assertEqual((kim.name.text, kim.profs.text), ("Kim (введено вручную)", "Кузнечное дело 150"))
-        self.assertIn("1. Обычный костер - Tester", list(tab.lastLines.values()))
+        self.assertEqual((kim.name.text, kim.profs.text), ("Kim (нет Campkeeper)", "профессии неизвестны"))
         notes = list(tab.lastNotes.values())
+        self.assertIn("Без Campkeeper: Bob, Kim - их профессии неизвестны и в план не входят.", notes)
         self.assertTrue(any(n.startswith("Пропущено, этот бафф даёт класс в группе: ") and "Магнетит" in n for n in notes))
+        # alone among known members, but not alone in the group: no "you are alone" note
+        self.assertNotIn("В группе вы один: для других объектов нужны ещё участники.", notes)
+
+        send_professions(env, "Kim", {164: 150})
+        kim = next(r for r in list(tab.ui.members.values()) if r.memberName == "Kim")
+        self.assertEqual((kim.name.text, kim.profs.text), ("Kim (через Campkeeper)", "Кузнечное дело 150"))
+        self.assertIn("2. Наковальня (T2) - Kim", list(tab.lastLines.values()))
+        self.assertIn("Без Campkeeper: Bob - их профессии неизвестны и в план не входят.", list(tab.lastNotes.values()))
         env.assert_no_errors()
 
 
