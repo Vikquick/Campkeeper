@@ -1,6 +1,6 @@
 # WoW Forever — разведка API
 
-Клиент Forever на этой машине: `E:\wow\World of Warcraft\_classic_beta_` (`WowB.exe`, продукт `wow_classic_beta`, 1.60.1).
+Клиент Forever (бета): `<папка WoW>\_classic_beta_` (`WowB.exe`, продукт `wow_classic_beta`, 1.60.1).
 Аддон подключён junction-ссылками в `_classic_beta_` и `_retail_` → `Interface\AddOns\ForeverApiDump`.
 
 ## 1. Номер Interface
@@ -69,7 +69,7 @@ python -m unittest discover tests
 Подключение к клиенту беты (один раз, PowerShell):
 
 ```
-New-Item -ItemType Junction -Path "E:\wow\World of Warcraft\_classic_beta_\Interface\AddOns\Campkeeper" -Target "C:\Users\vvvvi\addon\Campkeeper"
+New-Item -ItemType Junction -Path "<папка WoW>\_classic_beta_\Interface\AddOns\Campkeeper" -Target "<этот репозиторий>\Campkeeper"
 ```
 
 В игре: `/ck` (или `/campkeeper`) — окно, `/ck config` — настройки, `/ck debug [all|clear]` — отладочный журнал (последние 200 записей, хранится в `CampkeeperDB`). Команду `/camp` занять нельзя: это встроенный выход из игры.
