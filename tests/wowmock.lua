@@ -581,6 +581,29 @@ SOUNDKIT = { RAID_WARNING = 8959 }
 function PlaySound(id) table.insert(Mock.sounds, id) end
 
 ------------------------------------------------------------------------
+-- Window templates and group roster
+------------------------------------------------------------------------
+UISpecialFrames = {}
+function PanelTemplates_SetNumTabs(frame, n) frame.numTabs = n end
+function PanelTemplates_SetTab(frame, i) frame.selectedTab = i end
+function PanelTemplates_TabResize() end
+RAID_CLASS_COLORS = setmetatable({}, { __index = function() return { r = 1, g = 1, b = 1 } end })
+Mock.group = {} -- list of { name, class } for party1..N
+local _UnitName, _UnitClass = UnitName, UnitClass
+function UnitName(unit)
+  local i = unit:match("^party(%d)$")
+  if i then local m = Mock.group[tonumber(i)]; return m and m.name end
+  return _UnitName(unit)
+end
+UnitNameUnmodified = UnitName
+function UnitClass(unit)
+  local i = unit:match("^party(%d)$")
+  if i then local m = Mock.group[tonumber(i)]; if m then return m.class, m.class, 1 end return end
+  return _UnitClass(unit)
+end
+function GetNumGroupMembers() return #Mock.group > 0 and #Mock.group + 1 or 0 end
+
+------------------------------------------------------------------------
 -- Settings panel (AceConfigDialog:AddToBlizOptions)
 ------------------------------------------------------------------------
 Mock.settings = {}
@@ -660,4 +683,3 @@ function IsInGroup() return Mock.inGroup == true end
 function IsInRaid() return Mock.inRaid == true end
 function IsInGuild() return Mock.inGuild == true end
 function IsInInstance() return false, "none" end
-function GetNumGroupMembers() return 0 end

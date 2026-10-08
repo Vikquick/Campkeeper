@@ -76,6 +76,13 @@ class PlannerTest(unittest.TestCase):
         self.assertIsNone(r.fire)
         self.assertEqual(r.slots, 10)
 
+    def test_fire_to_member_least_needed(self):
+        cook_miner = ("Ann", "ROGUE", {"cooking": 50, "mining": 300})
+        cook_only = ("Zed", "ROGUE", {"cooking": 10})
+        r = plan(self.env, [cook_miner, cook_only], slots=3)
+        self.assertEqual(r.fire.member, "Zed")
+        self.assertEqual(picks(r), [("Ann", "smelter")])
+
     def test_deterministic(self):
         members = [FISHER, MINER, TAILOR, SKINNER, COOK]
         a = picks(plan(self.env, members, slots=5, role="leveling"))

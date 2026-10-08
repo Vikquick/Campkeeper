@@ -101,8 +101,10 @@ class DebugCommandTest(unittest.TestCase):
         opts.args.general.args.minimap.set(None, True)
         self.assertTrue(button.shown)
 
-        # left click opens settings while there is no window yet
-        env.lua.eval('LibStub("LibDataBroker-1.1"):GetDataObjectByName("Campkeeper").OnClick(nil, "LeftButton")')
+        broker = env.lua.eval('LibStub("LibDataBroker-1.1"):GetDataObjectByName("Campkeeper")')
+        broker.OnClick(None, "LeftButton")  # left click: window
+        self.assertTrue(env.ns.Window.IsShown(env.ns.Window))
+        broker.OnClick(None, "RightButton")  # right click: settings
         self.assertIsNotNone(env.lua.eval('LibStub("AceConfigDialog-3.0").OpenFrames["Campkeeper"]'))
         env.assert_no_errors()
 

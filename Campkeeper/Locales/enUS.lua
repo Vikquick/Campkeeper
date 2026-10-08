@@ -68,3 +68,43 @@ L["Someone uses an incompatible Campkeeper version. Please update the addon."] =
 
 -- Planner
 L["Camp plan:"] = true
+
+-- Window
+L["Catalog"] = true
+L["Planner"] = true
+L["Alts"] = true
+L["Tier %d"] = true
+L["Requires: %s (%d)"] = true
+L["Replaces: %s"] = true
+L["You know how to make it"] = true
+L["skill %d"] = true
+L["known"] = true
+L["Alchemy"] = true
+L["Blacksmithing"] = true
+L["Enchanting"] = true
+L["Engineering"] = true
+L["First Aid"] = true
+L["Fishing"] = true
+L["Herbalism"] = true
+L["Leatherworking"] = true
+L["Mining"] = true
+L["Skinning"] = true
+L["Tailoring"] = true
+L["Cooking"] = true
+L["unknown"] = true
+L["ready"] = true
+L["no professions"] = true
+L["Camping cooldown"] = true
+L["%s / camp items: %d / recipes: %s / blueprints: %s"] = true
+L["Leveling"] = true
+L["Dungeon"] = true
+L["Crafting"] = true
+L["%d slots"] = true
+L["Add"] = true
+L["Plan"] = true
+L["To group chat"] = true
+L["you"] = true
+L["via Campkeeper"] = true
+L["entered by hand"] = true
+L["no data"] = true
+L["Nobody can light this fire (Cooking %d)"] = true

@@ -5,7 +5,7 @@ local _, ns = ...
 --            fireTier = 1|2|3 (or slots = 3|5|10), role = "leveling"|"dungeon"|"craft" }
 --   result { fire = { member, tier }?, objects = { { member, key, tier, weight } }, slots }
 -- Every camping item shares one 1-hour cooldown, so each member places at most one thing; the
--- fire comes first. Objects whose class buff someone in the group already provides are skipped;
+-- fire goes to the capable member least needed for anything else. Objects whose class buff someone in the group already provides are skipped;
 -- the rest are ranked by the role's weights and each family gets the highest tier still
 -- available among unassigned members. Ties break by name, so equal input gives equal output.
 local Planner = { ROLES = { "leveling", "dungeon", "craft" } }
@@ -58,11 +58,6 @@ function Planner:Plan(input)
   local tierBySlots = { [3] = 1, [5] = 2, [10] = 3 }
   local fire = ns.Catalog:Fire(input.fireTier or tierBySlots[input.slots] or 1)
   result.slots = fire.slots
-  local placer = bestMember(members, used, "cooking", fire.skill)
-  if placer then
-    used[placer.name] = true
-    result.fire = { member = placer.name, tier = fire.tier }
-  end
 
   local provided = providedBuffs(members)
   local families = {}
@@ -76,6 +71,32 @@ function Planner:Plan(input)
     if a.weight ~= b.weight then return a.weight > b.weight end
     return a.key < b.key
   end)
+
+  -- The fire goes to the capable member who is least needed elsewhere: the one whose best
+  -- other object weighs least (ties: higher Cooking, then name).
+  local function otherValue(m)
+    local best = 0
+    for _, f in ipairs(families) do
+      local t1 = ns.Catalog:Get(f.family.objects[1])
+      if skillOf(m, f.family.profession) >= t1.skill and f.weight > best then best = f.weight end
+    end
+    return best
+  end
+  local placer
+  for _, m in ipairs(members) do
+    if skillOf(m, "cooking") >= fire.skill then
+      if not placer then placer = m
+      else
+        local a, b = otherValue(m), otherValue(placer)
+        local ca, cb = skillOf(m, "cooking"), skillOf(placer, "cooking")
+        if a < b or (a == b and ca > cb) then placer = m end
+      end
+    end
+  end
+  if placer then
+    used[placer.name] = true
+    result.fire = { member = placer.name, tier = fire.tier }
+  end
 
   for _, f in ipairs(families) do
     if #result.objects >= result.slots then break end

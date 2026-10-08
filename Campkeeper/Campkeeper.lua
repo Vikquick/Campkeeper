@@ -99,6 +99,9 @@ function Campkeeper:OnEnable()
   ns.Alerts:Init()
   ns.Panel:Init()
   ns.Pins:Init()
+  ns.Window:Init()
+  ns.AltsTab:Init()
+  ns.PlannerTab:Init()
   ns.callbacks:Fire("ENABLED")
 end
 
