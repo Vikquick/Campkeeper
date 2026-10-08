@@ -64,3 +64,6 @@ L["Sharing"] = "Обмен"
 L["Share camps in the shared channel"] = "Обмениваться лагерями в общем канале"
 L["Guild and group sharing always stay on."] = "Обмен в гильдии и группе работает всегда."
 L["Someone uses an incompatible Campkeeper version. Please update the addon."] = "У кого-то несовместимая версия Campkeeper. Обновите аддон."
+
+-- Planner
+L["Camp plan:"] = "План лагеря:"

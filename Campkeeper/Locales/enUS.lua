@@ -65,3 +65,6 @@ L["Sharing"] = true
 L["Share camps in the shared channel"] = true
 L["Guild and group sharing always stay on."] = true
 L["Someone uses an incompatible Campkeeper version. Please update the addon."] = true
+
+-- Planner
+L["Camp plan:"] = true

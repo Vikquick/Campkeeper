@@ -23,6 +23,7 @@ Core\Professions.lua
 Core\OwnCamp.lua
 Core\PanelModel.lua
 Core\CampStore.lua
+Core\Planner.lua
 Comm\Protocol.lua
 Comm\Comm.lua
 
