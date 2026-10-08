@@ -61,12 +61,19 @@ function Planner:Plan(input)
 
   local provided = providedBuffs(members)
   local families = {}
+  result.covered = {} -- tier-1 keys skipped because a class in the group gives that buff
   for key, family in pairs(ns.Catalog:Families()) do
     local weight = family.weights[role] or 0
-    if weight > 0 and not covered(family, provided) then
-      families[#families + 1] = { key = key, family = family, weight = weight }
+    if weight > 0 then
+      if covered(family, provided) then
+        result.covered[#result.covered + 1] = family.objects[1]
+      else
+        families[#families + 1] = { key = key, family = family, weight = weight }
+      end
     end
   end
+  table.sort(result.covered)
+  result.members = #members
   table.sort(families, function(a, b)
     if a.weight ~= b.weight then return a.weight > b.weight end
     return a.key < b.key

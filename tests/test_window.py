@@ -110,6 +110,49 @@ class PlannerTabTest(unittest.TestCase):
         self.assertEqual(profs, [("PARTY", 300)])
 
 
+class PlannerTabUiTest(unittest.TestCase):
+    def open(self, prepare=""):
+        env = started(prepare)
+        env.ns.Window.Show(env.ns.Window, 2)
+        return env, env.ns.PlannerTab
+
+    def test_alone_gets_an_explanation(self):
+        env, tab = self.open()
+        self.assertEqual(list(tab.lastLines.values()), ["1. Обычный костер - Tester"])
+        self.assertEqual(list(tab.lastNotes.values()), ["В группе вы один: для других объектов нужны ещё участники."])
+        ui = tab.ui
+        self.assertEqual([r.checked for r in list(ui.roles.values())[:3]], [True, False, False])
+        self.assertEqual([r.checked for r in list(ui.fires.values())[:3]], [True, False, False])
+        env.assert_no_errors()
+
+    def test_radio_selects_fire_and_goal(self):
+        env, tab = self.open()
+        fires = list(tab.ui.fires.values())
+        fires[2].scripts.OnClick(fires[2])
+        self.assertEqual([r.checked for r in fires[:3]], [False, False, True])
+        self.assertEqual(tab.lastPlan.slots, 10)
+        self.assertEqual(list(tab.lastNotes.values())[0], "Этот костёр некому развести (Кулинария 220)")
+
+    def test_manual_entry_and_covered_note(self):
+        env, tab = self.open('Mock.inGroup = true\nMock.group = { { name = "Bob", class = "PALADIN" }, '
+                             '{ name = "Kim", class = "ROGUE" } }')
+        ui = tab.ui
+        rows = list(ui.members.values())
+        kim = next(r for r in rows if r.memberName == "Kim")
+        self.assertEqual(kim.name.text, "Kim (нет Campkeeper)")
+        self.assertTrue(kim.edit.shown)
+        kim.edit.scripts.OnClick(kim.edit)  # "set professions" selects Kim for manual entry
+        ui.professionDropdown.scripts.OnClick(ui.professionDropdown)  # fallback dropdown cycles: alchemy -> blacksmithing
+        ui.skill.text = "150"
+        ui.add.scripts.OnClick(ui.add)
+        kim = next(r for r in list(ui.members.values()) if r.memberName == "Kim")
+        self.assertEqual((kim.name.text, kim.profs.text), ("Kim (введено вручную)", "Кузнечное дело 150"))
+        self.assertIn("1. Обычный костер - Tester", list(tab.lastLines.values()))
+        notes = list(tab.lastNotes.values())
+        self.assertTrue(any(n.startswith("Пропущено, этот бафф даёт класс в группе: ") and "Магнетит" in n for n in notes))
+        env.assert_no_errors()
+
+
 class AltsTabTest(unittest.TestCase):
     def test_rows_and_minimap_tooltip(self):
         env = started("Mock.bags[279960] = 2\nMock.itemCooldown = { start = Mock.time, duration = 750 }")
