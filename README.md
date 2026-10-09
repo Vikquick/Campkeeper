@@ -91,3 +91,7 @@ New-Item -ItemType Junction -Path "<папка WoW>\_classic_beta_\Interface\Add
    ```
 
 Генератор останавливается с ошибкой, если предмета из таблицы нет в сканировании, навык не совпал или сдвинулся порядок объектов (это порядок битов в протоколе обмена — новые объекты только в конец). `python tools/gen_catalog.py --check` проверяет, что закоммиченный каталог актуален.
+
+## Лицензия
+
+Campkeeper распространяется по лицензии MIT (`LICENSE`). Встроенные библиотеки в `Campkeeper/Libs` (Ace3, CallbackHandler, LibStub, HereBeDragons, LibDataBroker, LibDBIcon) — под своими лицензиями.
