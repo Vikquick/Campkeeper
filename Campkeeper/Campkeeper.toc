@@ -6,6 +6,8 @@
 ## Version: @project-version@
 ## SavedVariables: CampkeeperDB
 ## OptionalDeps: TomTom
+## X-Curse-Project-ID: 1735406
+## X-License: MIT
 
 embeds.xml
 
