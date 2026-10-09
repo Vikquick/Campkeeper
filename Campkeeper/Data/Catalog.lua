@@ -3,7 +3,7 @@
 local _, ns = ...
 
 ns.CatalogData = {
-  auras = { benefits = 1229741, near = 1283391, sitting = 1229739 },
+  auras = { benefits = 1229741, boostedRest = 1229451, near = 1283391, sitting = 1229739 },
   classBuffs = {
     arcane_intellect = {
       classes = { "MAGE" },

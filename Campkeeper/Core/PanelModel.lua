@@ -107,7 +107,8 @@ function PanelModel:Build(activeBuffs)
   return {
     rows = rows,
     header = { fireTier = camp and camp.tier, used = used, slots = slots,
-               fireRemaining = camp and ns.OwnCamp:FireRemaining(), cooldownRemaining = cooldown },
+               fireRemaining = camp and ns.OwnCamp:FireRemaining(), cooldownRemaining = cooldown,
+               boostedRest = ns.OwnCamp:BoostedRestRemaining() },
     sitting = { state = ns.CampState:Get(), remaining = ns.CampState:SittingRemaining(),
                 benefitsRemaining = ns.CampState:BenefitsRemaining() },
   }

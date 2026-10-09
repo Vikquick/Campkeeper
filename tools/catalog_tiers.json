@@ -1,6 +1,6 @@
 {
   "_comment": "Source of truth for the Campkeeper catalog. tools/gen_catalog.py resolves spells from out/scan.json and writes Campkeeper/Data/Catalog.lua. Object order is the protocol bit order: append new objects only, never reorder or remove.",
-  "auras": { "near": 1283391, "sitting": 1229739, "benefits": 1229741 },
+  "auras": { "near": 1283391, "sitting": 1229739, "benefits": 1229741, "boostedRest": 1229451 },
   "professions": {
     "alchemy": 171, "blacksmithing": 164, "enchanting": 333, "engineering": 202,
     "first_aid": 129, "fishing": 356, "herbalism": 182, "leatherworking": 165,

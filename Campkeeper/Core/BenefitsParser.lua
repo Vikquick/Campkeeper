@@ -13,16 +13,41 @@ ns.BenefitsParser = BenefitsParser
 
 local Util = ns.Util
 
+-- Exact names -> object, plus every (normalized name, object) pair for partial matches.
 local function nameIndex()
-  local index = {}
+  local index, all = {}, {}
   for _, o in ipairs(ns.Catalog:Objects()) do
     for _, name in ipairs(ns.Catalog:Names(o.key)) do
       local n = Util.normalize(name)
       -- several tiers can share a name only if the client reuses it; keep the higher tier
       if n and (not index[n] or index[n].tier < o.tier) then index[n] = o end
+      if n then all[#all + 1] = { name = " " .. n .. " ", object = o } end
     end
   end
-  return index
+  return index, all
+end
+
+local fuzzyLogged = {}
+
+-- The tooltip sometimes uses a shorter name than the item (seen: "Палатка" for "Лагерная палатка").
+-- Accept a name that appears as whole words inside exactly one object's name; when the candidates
+-- are tiers of one family, take the lowest tier. Logged once per name so it can be checked.
+local function partialMatch(all, n)
+  local needle, found = " " .. n .. " ", {}
+  for _, entry in ipairs(all) do
+    if entry.name:find(needle, 1, true) then found[entry.object.key] = entry.object end
+  end
+  local pick, family
+  for _, o in pairs(found) do
+    if family and o.family ~= family then return nil end
+    family = o.family
+    if not pick or o.tier < pick.tier then pick = o end
+  end
+  if pick and not fuzzyLogged[n] then
+    fuzzyLogged[n] = true
+    ns.log("benefits", "partial name match: %s -> %s", n, pick.key)
+  end
+  return pick
 end
 
 -- Remove colour, texture and grammar (|4singular:plural;) escape codes.
@@ -39,13 +64,14 @@ end
 
 -- Tooltip lines (header first; lines may contain embedded newlines) -> { objects, unknown }.
 function BenefitsParser:ParseLines(lines)
-  local index = nameIndex()
+  local index, all = nameIndex()
   local result = { objects = {}, unknown = {} }
   for i = 2, #lines do
     for line in (lines[i] .. "\n"):gmatch("(.-)\r?\n") do
       local name, effect = splitLine(line)
       if name then
-        local o = index[Util.normalize(name)]
+        local n = Util.normalize(name)
+        local o = index[n] or partialMatch(all, n)
         if o then
           table.insert(result.objects, { key = o.key, tier = o.tier, name = name, effect = effect })
         else

@@ -38,6 +38,7 @@ function AltsTab:Rows()
       -- whether a blueprint is learned cannot be read from the client yet (open question Q4)
       blueprints = L["unknown"],
       cooldown = cooldownText(c), ready = remaining ~= nil and remaining <= 0,
+      boostedRest = ns.OwnCamp:BoostedRestLeft(c),
     }
   end
   table.sort(rows, function(a, b)
@@ -81,7 +82,11 @@ function AltsTab:Refresh()
       l.cooldown:SetText(L["Camping cooldown: %s"]:format(r.cooldown))
       if i == 1 then self.lastCooldownText = l.cooldown:GetText() end
       l.details:SetText(L["%s / camp items: %d"]:format(r.professions ~= "" and r.professions or L["no professions"], r.items))
-      l.recipes:SetText(L["Recipes: %s / blueprints: %s"]:format(r.recipes ~= "" and r.recipes or "-", r.blueprints))
+      local recipes = L["Recipes: %s / blueprints: %s"]:format(r.recipes ~= "" and r.recipes or "-", r.blueprints)
+      if r.boostedRest then
+        recipes = ("%s / %s: %s"):format(recipes, ns.OwnCamp:BoostedRestName(), Util.formatDuration(r.boostedRest))
+      end
+      l.recipes:SetText(recipes)
       for _, fs in pairs(l) do fs:Show() end
     else
       for _, fs in pairs(l) do fs:Hide() end

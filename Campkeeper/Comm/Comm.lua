@@ -17,11 +17,13 @@ local versionNoticeShown = false
 
 local function sharing() return ns.db.profile.sharing end
 
+-- Why outgoing addon messages must wait right now ("lockdown", "restricted"), or nil.
 local function restricted()
   local info = C_ChatInfo
-  if not info then return false end
-  return (info.InChatMessagingLockdown and info.InChatMessagingLockdown())
-      or (info.AreOutgoingAddonChatMessagesRestricted and info.AreOutgoingAddonChatMessagesRestricted()) or false
+  if not info then return nil end
+  if info.InChatMessagingLockdown and info.InChatMessagingLockdown() then return "lockdown" end
+  if info.AreOutgoingAddonChatMessagesRestricted and info.AreOutgoingAddonChatMessagesRestricted() then return "restricted" end
+  return nil
 end
 
 local function playerName() return UnitName("player") end
@@ -60,13 +62,14 @@ end
 
 function Comm:Send(msg, distribution, target)
   local text = Protocol:Encode(msg)
-  if restricted() then
+  local why = restricted()
+  if why then
     queue[#queue + 1] = { text, distribution, target }
-    ns.callbacks:Fire("COMM_SENT", distribution, true)
+    ns.callbacks:Fire("COMM_SENT", distribution, why)
     return false
   end
   ns.addon:SendCommMessage(Protocol.PREFIX, text, distribution, target, self.PRIORITY)
-  ns.callbacks:Fire("COMM_SENT", distribution, false)
+  ns.callbacks:Fire("COMM_SENT", distribution, nil)
   return true
 end
 
@@ -76,6 +79,7 @@ function Comm:Flush()
   queue = {}
   for _, q in ipairs(pending) do
     ns.addon:SendCommMessage(Protocol.PREFIX, q[1], q[2], q[3], self.PRIORITY)
+    ns.callbacks:Fire("COMM_FLUSHED", q[2])
   end
 end
 

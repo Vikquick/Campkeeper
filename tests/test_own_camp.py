@@ -148,9 +148,24 @@ class LastBenefitsTest(unittest.TestCase):
         objects = [o.key for o in oc.LastBenefits(oc).objects.values()]
         self.assertEqual(objects, ["lodestone"])
 
+    def test_boosted_rest_timer(self):
+        env = started('Mock.spells[1229451] = { name = "Улучшенный отдых" }')
+        oc = env.ns.OwnCamp
+        self.assertEqual(env.ns.Catalog.auras.boostedRest, 1229451)  # found in beta, build 70291
+        self.assertIsNone(oc.BoostedRestRemaining(oc))
+        env.mock.AddAura(1283391)
+        env.mock.AddAura(1229451, 3600, "Улучшенный отдых")
+        env.advance(600)
+        self.assertEqual(oc.BoostedRestRemaining(oc), 3000)
+        self.assertEqual(char(env).boostedRestUntil, env.mock.serverTime + 3000)
+        self.assertEqual(env.ns.Panel.restText.text, "Улучшенный отдых: 50:00")
+        alts = env.ns.AltsTab
+        self.assertEqual(alts.Rows(alts)[1].boostedRest, 3000)
+
     def test_boosted_rest_hidden_without_spell_id(self):
         env = started()
-        self.assertIsNone(env.ns.Catalog.auras.boostedRest)
+        env.ns.Catalog.auras.boostedRest = None
+        env.mock.AddAura(1229451, 3600, "Улучшенный отдых")
         self.assertIsNone(env.ns.OwnCamp.BoostedRestRemaining(env.ns.OwnCamp))
 
 

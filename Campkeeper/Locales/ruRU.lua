@@ -138,3 +138,4 @@ L["Durations: sitting %s s; benefits %s s"] = "Длительности: сид�
 L["Placement errors: %s"] = "Ошибки установки: %s"
 L["Catalog check (build %s): missing items %d, missing spells %d"] = "Проверка каталога (сборка %s): нет предметов %d, нет заклинаний %d"
 L["Catalog check: not run yet"] = "Проверка каталога ещё не выполнялась"
+L["Q5 queued: %s (why: %s); sent from the queue: %s"] = "Q5 в очереди: %s (причина: %s); отправлено из очереди: %s"

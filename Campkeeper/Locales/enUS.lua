@@ -139,3 +139,4 @@ L["Durations: sitting %s s; benefits %s s"] = true
 L["Placement errors: %s"] = true
 L["Catalog check (build %s): missing items %d, missing spells %d"] = true
 L["Catalog check: not run yet"] = true
+L["Q5 queued: %s (why: %s); sent from the queue: %s"] = true

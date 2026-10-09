@@ -117,6 +117,17 @@ class Q5Test(unittest.TestCase):
         self.assertEqual(q5.others["CHANNEL"], 1)
         self.assertTrue(q5.senders["Ann"])
 
+    def test_queue_reason_and_flush(self):
+        env = started()
+        env.mock.chatLockdown = True
+        env.mock.Cast(FIRE1_PLACE)
+        q5 = research(env)["q5"]
+        self.assertEqual((q5.queued["PARTY"], q5.reasons["lockdown"]), (1, 1))
+        self.assertIsNone(q5.flushed["PARTY"])
+        env.mock.chatLockdown = False
+        env.advance(5)
+        self.assertEqual(q5.flushed["PARTY"], 1)
+
 
 class BlockedErrorsCatalogTest(unittest.TestCase):
     def test_blocked_errors_and_catalog(self):

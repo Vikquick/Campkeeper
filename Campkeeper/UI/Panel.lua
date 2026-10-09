@@ -11,7 +11,7 @@ ns.Panel = Panel
 local STATUS_TEXT = { placed = "placed", placeable = "click to place", covered = "covered by a class buff" }
 local STATUS_COLOR = { placed = { 0.3, 1, 0.3 }, placeable = { 1, 0.82, 0 }, covered = { 0.6, 0.6, 0.6 } }
 
-local frame, rows, title, fireText, cooldownText, bar, barText, hint
+local frame, rows, title, fireText, cooldownText, restText, bar, barText, hint
 local pendingUpdate, hideTimer, hintTimer = false, nil, nil
 
 local function inCombat() return InCombatLockdown() end
@@ -91,6 +91,10 @@ local function create()
   cooldownText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   cooldownText:SetJustifyH("LEFT")
 
+  restText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  restText:SetJustifyH("LEFT")
+  restText:SetTextColor(0.6, 0.85, 1)
+
   bar = CreateFrame("StatusBar", nil, frame)
   bar:SetHeight(14)
   bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -107,6 +111,7 @@ local function create()
   for i = 1, Panel.MAX_ROWS do rows[i] = createRow(i) end
   Panel.rows, Panel.frame, Panel.title, Panel.fireText, Panel.bar, Panel.barText, Panel.hint, Panel.cooldownText =
     rows, frame, title, fireText, bar, barText, hint, cooldownText
+  Panel.restText = restText
   frame:Hide()
 end
 
@@ -166,6 +171,15 @@ local function render(model)
     y = y - 14
   else
     cooldownText:Hide()
+  end
+  if model.header.boostedRest and model.header.boostedRest > 0 then
+    restText:SetText(("%s: %s"):format(ns.OwnCamp:BoostedRestName(), Util.formatDuration(model.header.boostedRest)))
+    restText:ClearAllPoints()
+    restText:SetPoint("TOPLEFT", 8, y)
+    restText:Show()
+    y = y - 14
+  else
+    restText:Hide()
   end
   for i, b in ipairs(rows) do
     local r = model.rows[i]

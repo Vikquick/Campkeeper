@@ -87,10 +87,11 @@ class CampStateTest(unittest.TestCase):
         api = self.env.ns.api
         original = api.playerAura
         api.playerAura = lambda spell: calls.append(spell) or original(spell)
+        camp = lambda: [s for s in calls if s in (NEAR, SITTING, BENEFITS)]
         self.add(12345, 30)
-        self.assertEqual(calls, [])
+        self.assertEqual(camp(), [])
         self.add(NEAR)
-        self.assertEqual(len(calls), 3)
+        self.assertEqual(len(camp()), 3)
 
     def test_frozen_in_combat_then_rebuilt(self):
         self.add(NEAR)

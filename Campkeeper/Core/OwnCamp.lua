@@ -124,6 +124,19 @@ function OwnCamp:BenefitsRemaining()
   return b and (b.expiresAt - ns.api.serverTime()) or nil
 end
 
+-- Name of the Boosted Rest aura in the client language.
+function OwnCamp:BoostedRestName()
+  local spell = ns.Catalog.auras.boostedRest
+  return spell and ns.api.spellName(spell) or "Boosted Rest"
+end
+
+-- Seconds of Boosted Rest left for a stored character record (alts), nil if none.
+function OwnCamp:BoostedRestLeft(charRecord)
+  local untilAt = charRecord.boostedRestUntil
+  local left = untilAt and untilAt - ns.api.serverTime()
+  return left and left > 0 and left or nil
+end
+
 -- Boosted Rest: shown only once its aura spell ID is known (catalog auras.boostedRest).
 function OwnCamp:BoostedRestRemaining()
   local spell = ns.Catalog.auras.boostedRest

@@ -61,6 +61,26 @@ class ParseLinesTest(unittest.TestCase):
         self.assertEqual((unknown[0].name, unknown[0].effect), ("Таинственный тотем", "+5 к удаче"))
         self.assertTrue(any("Таинственный тотем" in m for m in self.log(env)))
 
+    def test_real_tooltip_with_short_tent_name(self):
+        # client 1.60.1 build 70291: the tent is listed as "Палатка", its item is "Лагерная палатка"
+        env = parser_env(names={**RU_NAMES, 279978: "Лагерная палатка", 279967: "Аквариум"})
+        r = self.parse(env, HEADER,
+                       "Получены следующие бонусы лагеря:\r\n\r\nПалатка: объем опыта, который вы получаете после "
+                       "отдыха, немного увеличен. Этот эффект можно получить не чаще чем раз в 1 ч.\r\n\r\n"
+                       "Круг для заточки: сила повышена на 6.\r\n\r\nАквариум: все характеристики повышены на 8%.\r\n\r\n",
+                       REMAINING)
+        self.assertEqual([k for k, _, _ in self.objects(r)], ["camp_tent", "sharpening_wheel", "fish_bowl"])
+        self.assertEqual(len(r.unknown), 0)
+        self.assertEqual(self.log(env), ["partial name match: палатка -> camp_tent"])
+        self.parse(env, HEADER, "Палатка: опыт.")
+        self.assertEqual(len(self.log(env)), 1)  # logged once per name
+
+    def test_ambiguous_partial_name_stays_unknown(self):
+        env = parser_env(names={279989: "Верстак анархиста", 279938: "Верстак зверолова"})
+        r = self.parse(env, HEADER, "Верстак: что-то.")
+        self.assertEqual(self.objects(r), [])
+        self.assertEqual(r.unknown[1].name, "Верстак")
+
     def test_higher_tier_name_and_replaced_t1_name(self):
         env = parser_env()
         r = self.parse(env, HEADER, "Наковальня: сила повышена на 6.\r\nКруг для заточки: сила повышена на 6.")

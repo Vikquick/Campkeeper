@@ -24,7 +24,9 @@ local function store()
   local r = ns.db.global.research
   for _, key in ipairs({ "q1", "q2", "q3", "q4", "blocked", "fire", "errors" }) do r[key] = r[key] or {} end
   r.q5 = r.q5 or {}
-  for _, key in ipairs({ "sent", "queued", "echo", "others", "senders" }) do r.q5[key] = r.q5[key] or {} end
+  for _, key in ipairs({ "sent", "queued", "flushed", "reasons", "echo", "others", "senders" }) do
+    r.q5[key] = r.q5[key] or {}
+  end
   r.durations = r.durations or { sitting = {}, benefits = {} }
   return r
 end
@@ -185,11 +187,19 @@ function Research:ScanBags()
 end
 
 -- Q5 ----------------------------------------------------------------------------------------
-function Research:OnSent(distribution, queued)
+-- `why` is the reason the message was queued ("lockdown", "restricted") or nil if it went out.
+function Research:OnSent(distribution, why)
   if not enabled() then return end
   local q5 = store().q5
   inc(q5.sent, distribution)
-  if queued then inc(q5.queued, distribution) end
+  if why then
+    inc(q5.queued, distribution)
+    inc(q5.reasons, why)
+  end
+end
+
+function Research:OnFlushed(distribution)
+  if enabled() then inc(store().q5.flushed, distribution) end
 end
 
 function Research:OnAddonMessage(prefix, distribution, sender)
@@ -284,6 +294,8 @@ function Research:Report()
   add("Q4 camp blueprints seen: %d (learned: %d)", n4, known)
 
   add("Q5 sent: %s; own echo: %s; from others: %s", keysJoined(r.q5.sent), keysJoined(r.q5.echo), keysJoined(r.q5.others))
+  add("Q5 queued: %s (why: %s); sent from the queue: %s", keysJoined(r.q5.queued), keysJoined(r.q5.reasons),
+      keysJoined(r.q5.flushed))
 
   add("Blocked actions: %d", #r.blocked)
   local burn = {}
@@ -323,7 +335,8 @@ function Research:Init()
   ns.RegisterCallback(self, "CAMP_NEAR_CHANGED", function(_, near) Research:OnNearChanged(near) end)
   ns.RegisterCallback(self, "CAMP_STATE_CHANGED", function(_, _, new, info) Research:OnStateChanged(new, info) end)
   ns.RegisterCallback(self, "CAMP_BENEFITS_GAINED", function(_, _, info) Research:OnBenefitsGained(info) end)
-  ns.RegisterCallback(self, "COMM_SENT", function(_, distribution, queued) Research:OnSent(distribution, queued) end)
+  ns.RegisterCallback(self, "COMM_SENT", function(_, distribution, why) Research:OnSent(distribution, why) end)
+  ns.RegisterCallback(self, "COMM_FLUSHED", function(_, distribution) Research:OnFlushed(distribution) end)
   ns.RegisterCallback(self, "CAMP_UI_ERROR", function(_, errorType, message, key) Research:OnUIError(errorType, message, key) end)
 
   local pending
