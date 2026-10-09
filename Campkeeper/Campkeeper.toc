@@ -29,6 +29,7 @@ Core\CampStore.lua
 Core\Planner.lua
 Comm\Protocol.lua
 Comm\Comm.lua
+Dev\Research.lua
 
 UI\Options.lua
 UI\Minimap.lua

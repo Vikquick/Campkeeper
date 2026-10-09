@@ -121,3 +121,21 @@ L["You are alone: other objects need more group members."] = true
 L["Every member already places something; more members would fill the free places."] = true
 L["The remaining members have no profession skill for the other objects."] = true
 L["Skipped, a class in the group gives this buff: %s"] = true
+
+-- Beta research
+L["/ck report [clear] - beta data summary"] = true
+L["Beta data cleared."] = true
+L["Beta data (stays on your computer):"] = true
+L["Collect beta data for the developer"] = true
+L["Stays on your computer in the saved variables; /ck report shows it."] = true
+L["Q1 benefits tooltips: %d; higher tiers seen: %s; unknown names: %s"] = true
+L["Q2 aura radius: appears at %s yd, disappears at %s yd (%d samples)"] = true
+L["Q3 auras gained at camps: %d; with a tent: %s"] = true
+L["Q4 camp blueprints seen: %d (learned: %d)"] = true
+L["Q5 sent: %s; own echo: %s; from others: %s"] = true
+L["Blocked actions: %d"] = true
+L["Campfire burned: %s s"] = true
+L["Durations: sitting %s s; benefits %s s"] = true
+L["Placement errors: %s"] = true
+L["Catalog check (build %s): missing items %d, missing spells %d"] = true
+L["Catalog check: not run yet"] = true

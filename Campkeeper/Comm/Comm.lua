@@ -62,9 +62,11 @@ function Comm:Send(msg, distribution, target)
   local text = Protocol:Encode(msg)
   if restricted() then
     queue[#queue + 1] = { text, distribution, target }
+    ns.callbacks:Fire("COMM_SENT", distribution, true)
     return false
   end
   ns.addon:SendCommMessage(Protocol.PREFIX, text, distribution, target, self.PRIORITY)
+  ns.callbacks:Fire("COMM_SENT", distribution, false)
   return true
 end
 

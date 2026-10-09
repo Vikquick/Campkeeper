@@ -60,9 +60,11 @@ function OwnCamp:NoteAttempt(key)
 end
 
 -- UI_ERROR_MESSAGE: report placement failures that follow an attempt.
-function OwnCamp:OnUIError(errorType)
+function OwnCamp:OnUIError(errorType, message)
+  if not attempt or ns.api.now() - attempt.at > self.ATTEMPT_WINDOW then return end
+  ns.callbacks:Fire("CAMP_UI_ERROR", errorType, message, attempt.key)
   local reason = self.ERRORS[errorType]
-  if not reason or not attempt or ns.api.now() - attempt.at > self.ATTEMPT_WINDOW then return end
+  if not reason then return end
   local key = attempt.key
   attempt = nil
   ns.callbacks:Fire("CAMP_PLACE_FAILED", key, reason)

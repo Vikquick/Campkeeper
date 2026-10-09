@@ -59,12 +59,15 @@ function CampState:Rebuild()
   local benefitsID = benefits and benefits.instanceID or nil
   local benefitsChanged = benefitsID ~= info.benefitsInstanceID
 
+  local wasNear = info.near == true
   info.near = near ~= false
   info.sittingExpires = sitting and sitting.expirationTime or nil
   info.benefitsExpires = benefits and benefits.expirationTime or nil
   info.benefitsDuration = benefits and benefits.duration or nil
   info.benefitsInstanceID = benefitsID
   if benefitsChanged then info.benefits = nil end -- composition of a new aura is parsed again
+
+  if wasNear ~= info.near then ns.callbacks:Fire("CAMP_NEAR_CHANGED", info.near, info) end
 
   local old = state
   state = new

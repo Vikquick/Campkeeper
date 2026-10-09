@@ -519,15 +519,21 @@ end
 function Mock.AuraID(spellId)
   for id, a in pairs(Mock.auras) do if a.spellId == spellId then return id end end
 end
-C_TooltipInfo = {
-  GetUnitBuffByAuraInstanceID = function(unit, id)
+C_TooltipInfo = C_TooltipInfo or {}
+C_TooltipInfo.GetBagItem = function(bag, slot)
+  local lines = Mock.bagTooltips[bag .. ":" .. slot]
+  if not lines then return nil end
+  local out = {}
+  for i, text in ipairs(lines) do out[i] = { leftText = text } end
+  return { lines = out }
+end
+C_TooltipInfo.GetUnitBuffByAuraInstanceID = function(unit, id)
     local t = unit == "player" and Mock.tooltips[id]
     if not t then return nil end
     local lines = {}
     for i, text in ipairs(t) do lines[i] = { leftText = text } end
     return { type = 7, lines = lines }
-  end,
-}
+end
 
 ------------------------------------------------------------------------
 -- SavedVariables writer (for relog tests)
@@ -560,9 +566,21 @@ function GetProfessionInfo(i)
   if p then return p.name or "prof", 0, p.rank, p.max or 300, 0, 0, p.skillLine end
 end
 C_Item.GetItemCount = function(id) return Mock.bags[id] or 0 end
+Mock.containers = {} -- [bag] = { [slot] = itemID }
 C_Container = {
   GetItemCooldown = function() return Mock.itemCooldown.start, Mock.itemCooldown.duration, 1 end,
+  GetContainerNumSlots = function(bag) local b = Mock.containers[bag]; return b and 16 or 0 end,
+  GetContainerItemID = function(bag, slot) local b = Mock.containers[bag]; return b and b[slot] end,
 }
+Mock.itemClass = {} -- [itemID] = classID; unknown items are "missing" for GetItemInfoInstant
+C_Item.GetItemInfoInstant = function(id)
+  if Mock.missingItems and Mock.missingItems[id] then return nil end
+  return id, "type", "subtype", "", 134400, Mock.itemClass[id] or 0, 0
+end
+C_Spell.DoesSpellExist = function(id) return not (Mock.missingSpells and Mock.missingSpells[id]) end
+ITEM_SPELL_KNOWN = "Already known"
+Mock.bagTooltips = {} -- ["bag:slot"] = { lines }
+C_TooltipInfo = C_TooltipInfo or {}
 function IsPlayerSpell(id) return Mock.knownSpells[id] == true end
 C_TradeSkillUI = {
   GetRecipeInfo = function(id) local r = Mock.recipes[id]; if r ~= nil then return { recipeID = id, learned = r } end end,

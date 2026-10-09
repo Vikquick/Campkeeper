@@ -65,7 +65,10 @@ function BenefitsParser:Parse(auraInstanceID, done, attempt)
   local lines = ns.api.buffTooltipLines(auraInstanceID)
   if lines then
     local result = self:ParseLines(lines)
-    if #result.objects + #result.unknown > 0 then return done(result) end
+    if #result.objects + #result.unknown > 0 then
+      result.raw = lines
+      return done(result)
+    end
   end
   if attempt >= self.RETRIES then
     ns.log("benefits", "no camp objects in tooltip of aura %s after %d attempts", tostring(auraInstanceID), attempt)

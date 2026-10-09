@@ -14,6 +14,7 @@ ns.defaults = {
     debugLog = {},
     chars = {},
     camps = {},
+    research = {},
   },
   char = {},
   profile = {
@@ -21,6 +22,7 @@ ns.defaults = {
     minimap = { hide = false },
     alerts = { near = true, gained = true, ending = true, cooldown = true, fire = true },
     sharing = { channel = true },
+    research = true,
   },
 }
 
@@ -34,6 +36,7 @@ function Campkeeper:OnInitialize()
   ns.Log:Attach(self.db.global.debugLog)
   ns.Alerts:AddOptions()
   ns.Comm:AddOptions()
+  ns.Research:AddOptions()
   ns.Options:Register()
   ns.MinimapButton:Init()
   -- Not /camp: that is the client's built-in logout command and always wins.
@@ -45,6 +48,7 @@ end
 local function onUnitEvent(_, event, _, ...)
   if event == "UNIT_AURA" then
     ns.CampState:OnUnitAura((...))
+    ns.Research:OnUnitAura((...))
   elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
     local _, spellID = ...
     ns.OwnCamp:OnSpellSucceeded(spellID)
@@ -73,7 +77,7 @@ function Campkeeper:OnEnable()
     ns.Professions:ScanAll()
     ns.OwnCamp:UpdateCooldown()
   end)
-  self:RegisterEvent("UI_ERROR_MESSAGE", function(_, errorType) ns.OwnCamp:OnUIError(errorType) end)
+  self:RegisterEvent("UI_ERROR_MESSAGE", function(_, errorType, message) ns.OwnCamp:OnUIError(errorType, message) end)
   self:RegisterEvent("BAG_UPDATE_DELAYED", function()
     ns.Professions:ScanBags()
     ns.OwnCamp:UpdateCooldown()
@@ -96,6 +100,7 @@ function Campkeeper:OnEnable()
   ns.OwnCamp:UpdateCooldown()
   ns.CampStore:Init()
   ns.Comm:Init()
+  ns.Research:Init()
   ns.Alerts:Init()
   ns.Panel:Init()
   ns.Pins:Init()
@@ -110,6 +115,7 @@ function Campkeeper:PrintHelp()
   self:Print(L["/ck - open the Campkeeper window"])
   self:Print(L["/ck config - open settings"])
   self:Print(L["/ck debug [all||clear] - show the debug log"])
+  self:Print(L["/ck report [clear] - beta data summary"])
 end
 
 function Campkeeper:PrintDebugLog(all)
@@ -131,6 +137,14 @@ function Campkeeper:ChatCommand(input)
       self:Print(L["Debug log cleared."])
     else
       self:PrintDebugLog(arg == "all")
+    end
+  elseif cmd == "report" then
+    if arg == "clear" then
+      ns.Research:Clear()
+      self:Print(L["Beta data cleared."])
+    else
+      self:Print(L["Beta data (stays on your computer):"])
+      for _, line in ipairs(ns.Research:Report()) do self:Print(line) end
     end
   elseif cmd == "config" then
     ns.Options:Open()
