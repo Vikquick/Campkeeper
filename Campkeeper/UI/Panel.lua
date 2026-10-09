@@ -5,7 +5,9 @@ local Util = ns.Util
 -- Camp panel next to the buffs. Shown while NEAR/SITTING/BUFFED, hidden 10 s after AWAY and
 -- always hidden in combat. Rows that can be placed are secure item buttons; their attributes
 -- (and the panel's visibility, since it parents them) change only out of combat.
-local Panel = { MAX_ROWS = 14, ROW_HEIGHT = 18, WIDTH = 260, HIDE_DELAY = 10, HINT_TIME = 6 }
+-- STATUS_WIDTH: the status/effect column has a fixed width; longer text is cut with an ellipsis
+-- and shown in full in the row tooltip.
+local Panel = { MAX_ROWS = 14, ROW_HEIGHT = 18, WIDTH = 300, STATUS_WIDTH = 150, HIDE_DELAY = 10, HINT_TIME = 6 }
 ns.Panel = Panel
 
 local STATUS_TEXT = { placed = "placed", placeable = "click to place", covered = "covered by a class buff" }
@@ -34,6 +36,7 @@ local function createRow(i)
   b.icon:SetPoint("LEFT")
   b.status = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   b.status:SetPoint("RIGHT")
+  b.status:SetWidth(Panel.STATUS_WIDTH)
   b.status:SetJustifyH("RIGHT")
   b.status:SetWordWrap(false)
   b.name = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -49,8 +52,8 @@ local function createRow(i)
       GameTooltip:SetItemByID(self.item)
     else
       GameTooltip:AddLine(ns.Catalog:Name(self.key))
-      local desc = ns.Catalog:Description(self.key)
-      if desc then GameTooltip:AddLine(desc, 1, 1, 1, true) end
+      local text = self.effect or ns.Catalog:Description(self.key)
+      if text then GameTooltip:AddLine(text, 1, 1, 1, true) end
     end
     GameTooltip:Show()
   end)
@@ -142,7 +145,7 @@ local function applySecure(model)
       b:SetAttribute("item", b.item and ("item:" .. b.item) or nil)
       b:Show()
     else
-      b.key, b.item = nil, nil
+      b.key, b.item, b.effect = nil, nil, nil
       b:SetAttribute("type", nil)
       b:SetAttribute("item", nil)
       b:Hide()
@@ -189,7 +192,8 @@ local function render(model)
       b:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -8, y)
       b.icon:SetTexture(ns.Catalog:Icon(r.key))
       b.name:SetText(ns.Catalog:Name(r.key))
-      b.status:SetText(r.status == "placed" and r.effect or L[STATUS_TEXT[r.status]])
+      b.effect = r.effect
+      b.status:SetText(r.status == "placed" and r.effect and Util.firstSentence(r.effect) or L[STATUS_TEXT[r.status]])
       b.status:SetTextColor(unpack(STATUS_COLOR[r.status]))
       y = y - Panel.ROW_HEIGHT
     end

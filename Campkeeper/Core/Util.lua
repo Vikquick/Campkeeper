@@ -36,6 +36,12 @@ function Util.safeCall(tag, fn, ...)
   return finish(tag, pcall(fn, ...))
 end
 
+-- "One. Two." -> "One." (whole text when there is a single sentence)
+function Util.firstSentence(text)
+  if type(text) ~= "string" then return text end
+  return text:match("^(.-[%.!?])%s") or text
+end
+
 -- 75 -> "1:15", 3725 -> "1:02:05"
 function Util.formatDuration(seconds)
   seconds = math.max(0, math.floor((seconds or 0) + 0.5))

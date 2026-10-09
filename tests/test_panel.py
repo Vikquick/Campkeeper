@@ -116,6 +116,24 @@ class SittingBarTest(unittest.TestCase):
         self.assertIsNone(panel(env).hint.text)
 
 
+class LongEffectTest(unittest.TestCase):
+    def test_long_effect_is_cut_to_first_sentence_with_full_text_in_tooltip(self):
+        env = started('Mock.items[279978] = { name = "Лагерная палатка" }')
+        effect = ("объем опыта, который вы получаете после отдыха, немного увеличен. "
+                  "Этот эффект можно получить не чаще чем раз в 1 ч.")
+        b = env.mock.AddAura(BENEFITS, 3600)
+        env.lua.eval("function(id, t) Mock.tooltips[id] = t end")(b, env.lua.table_from(
+            ["Бонусы лагеря", "Получены следующие бонусы лагеря:\r\n\r\nПалатка: " + effect + "\r\n\r\n"]))
+        env.advance(1)
+        r = row(env, 1)
+        self.assertEqual(r.name.text, "Лагерная палатка")
+        self.assertEqual(r.status.text, "объем опыта, который вы получаете после отдыха, немного увеличен.")
+        self.assertEqual(r.status.width, 150)  # fixed column: the rest is cut, never spills over the panel
+        self.assertEqual(r.effect, effect)
+        self.assertEqual(panel(env).frame.width, 300)
+        env.assert_no_errors()
+
+
 class HeaderTest(unittest.TestCase):
     def test_own_fire_header(self):
         env = started('Mock.spells[1307252] = { name = "Костер подмастерья" }')
