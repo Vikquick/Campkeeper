@@ -16,7 +16,7 @@
 | Social links | GitHub: https://github.com/Vikquick/Campkeeper (Issues — https://github.com/Vikquick/Campkeeper/issues) |
 | Wiki | https://github.com/Vikquick/Campkeeper/wiki (страницы — `docs/wiki/`, публикация — `python tools/sync_wiki.py`) |
 | Issues URL | https://github.com/Vikquick/Campkeeper/issues |
-| Donation method | пока нет; если появится — Ko-fi (без комиссии площадки) |
+| Donation method | No donation method (Boosty в списке нет); ссылка https://boosty.to/vikquick21/donate — в описании и на главной вики |
 | Enable Project Pages | да: страница Roadmap (текст ниже) |
 | Game version | World of Warcraft: Forever (Interface 16001) — сборщик проставит сам |
 
@@ -53,6 +53,10 @@ Campkeeper is in **alpha** while *Forever* is in beta. Object names come from yo
 
 Bugs and ideas: https://github.com/Vikquick/Campkeeper/issues
 
+Guide to camping in Forever and every camp object: https://github.com/Vikquick/Campkeeper/wiki
+
+Like Campkeeper? You can support it on Boosty: https://boosty.to/vikquick21/donate
+
 ## Описание (RU)
 
 **Campkeeper** — помощник для системы лагерей *World of Warcraft: Forever*: костры, объекты профессий и часовой бафф «Бонусы лагеря».
@@ -63,6 +67,10 @@ Bugs and ideas: https://github.com/Vikquick/Campkeeper/issues
 - **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника в час; альты с профессиями, предметами, рецептами и перезарядкой.
 
 Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — альфа на время беты *Forever*.
+
+Справка по лагерям и всем объектам: https://github.com/Vikquick/Campkeeper/wiki
+
+Поддержать разработку: https://boosty.to/vikquick21/donate
 
 ## Project Page «Roadmap» (CurseForge)
 

@@ -18,3 +18,4 @@
 
 - Download: [CurseForge](https://www.curseforge.com/wow/addons/campkeeper) / [GitHub releases](https://github.com/Vikquick/Campkeeper/releases)
 - Bugs and ideas: [issues](https://github.com/Vikquick/Campkeeper/issues)
+- Support the development: [Boosty](https://boosty.to/vikquick21/donate)
