@@ -49,7 +49,7 @@
 - `/ck config` — settings
 - `/ck debug` — diagnostic log (please attach it to bug reports)
 
-Campkeeper is in **alpha** while *Forever* is in beta. Object names come from your game client, so it works in every language; the interface is in English and Russian.
+Campkeeper is in **beta** while *Forever* is in beta. Object names come from your game client, so it works in every language; the interface is in English and Russian.
 
 Bugs and ideas: https://github.com/Vikquick/Campkeeper/issues
 
@@ -66,7 +66,7 @@ Like Campkeeper? You can support it on Boosty: https://boosty.to/vikquick21/dona
 - **Лагеря на карте:** свои и посещённые лагеря на карте мира и миникарте, путевая точка по клику (поддерживается TomTom); обмен с гильдией, группой и необязательным общим каналом, чужие сообщения подтверждаются вторым игроком.
 - **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника; альты с профессиями, предметами, рецептами и перезарядкой.
 
-Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — альфа на время беты *Forever*.
+Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — бета на время беты *Forever*.
 
 Справка по лагерям и всем объектам: https://github.com/Vikquick/Campkeeper/wiki
 
@@ -78,8 +78,8 @@ Like Campkeeper? You can support it on Boosty: https://boosty.to/vikquick21/dona
 
 | When | Stage | What it brings |
 |---|---|---|
-| October 2026 | **Alpha** | Camp panel, timers and alerts, checked in the *Forever* beta. |
-| End of October 2026 | **Beta** | Camps on the map and sharing with guild, group and the shared channel, checked with several players. |
+| October 2026 | **Alpha** (done) | Camp panel, timers and alerts, checked in the *Forever* beta. |
+| 10 October 2026 | **Beta** (now) | Camps on the map, sharing with guild, group and the shared channel, catalog, planner and alts window. |
 | 4 November 2026 | **1.0** | Release together with *Forever*: catalog, planner and alts window checked on the live game. |
 | After launch | Updates | The catalog follows game patches; fixes from your reports. |
 
