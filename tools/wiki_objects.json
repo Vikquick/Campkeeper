@@ -1,5 +1,5 @@
 {
-  "_comment": "English names and effects for docs/wiki/Camp-Objects.md (tools/gen_wiki.py). Tiers, skills, replacements and class-buff exclusivity come from Campkeeper/Data/Catalog.lua; here only what the catalog does not know. Effects follow the placement spell texts of client 1.60.1; an upgrade's 'also gives the bonus of' line is added by the generator.",
+  "_comment": "English names and effects for docs/wiki/Camp-Objects.md (tools/gen_wiki.py). Tiers, skills, replacements and class-buff exclusivity come from Campkeeper/Data/Catalog.lua; here only what the catalog does not know. Effects follow the placement spell texts of client 1.60.1 build 70334; an upgrade's 'also gives the bonus of' line is added by the generator.",
   "professions": {
     "alchemy": "Alchemy", "blacksmithing": "Blacksmithing", "enchanting": "Enchanting", "engineering": "Engineering",
     "first_aid": "First Aid", "fishing": "Fishing", "herbalism": "Herbalism", "leatherworking": "Leatherworking",
@@ -22,7 +22,7 @@
     "sharpening_wheel":    { "name": "Sharpening Wheel",           "effect": "+6 Strength." },
     "anvil":               { "name": "Anvil",                      "effect": "" },
     "master_forge":        { "name": "Master Forge",               "effect": "Required to craft certain items." },
-    "enchanted_lute":      { "name": "Enchanted Lute",             "effect": "+71 Armor and +2 to all stats." },
+    "enchanted_lute":      { "name": "Enchanted Lute",             "effect": "+114 Armor and +4 to all stats." },
     "arcane_disenchanter": { "name": "Arcane Salvager",            "effect": "Makes disenchanting more efficient." },
     "arcane_forge":        { "name": "Arcane Forge",               "effect": "Required to craft certain items." },
     "reagent_bot":         { "name": "Reagent Bot",                "effect": "Everyone nearby can buy reagents. No stat bonus." },
