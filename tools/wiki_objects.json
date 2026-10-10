@@ -1,0 +1,55 @@
+{
+  "_comment": "English names and effects for docs/wiki/Camp-Objects.md (tools/gen_wiki.py). Tiers, skills, replacements and class-buff exclusivity come from Campkeeper/Data/Catalog.lua; here only what the catalog does not know. Effects follow the placement spell texts of client 1.60.1; an upgrade's 'also gives the bonus of' line is added by the generator.",
+  "professions": {
+    "alchemy": "Alchemy", "blacksmithing": "Blacksmithing", "enchanting": "Enchanting", "engineering": "Engineering",
+    "first_aid": "First Aid", "fishing": "Fishing", "herbalism": "Herbalism", "leatherworking": "Leatherworking",
+    "mining": "Mining", "skinning": "Skinning", "tailoring": "Tailoring", "cooking": "Cooking"
+  },
+  "classBuffs": {
+    "wisdom": "Blessing of Wisdom", "kings": "Blessing of Kings", "might": "Blessing of Might",
+    "strength_of_earth": "Strength of Earth Totem", "mark_of_the_wild": "Mark of the Wild", "moonkin_aura": "Moonkin Aura",
+    "fortitude": "Power Word: Fortitude", "divine_spirit": "Divine Spirit", "arcane_intellect": "Arcane Intellect"
+  },
+  "fires": {
+    "1": "Basic Campfire",
+    "2": "Journeyman Campfire",
+    "3": "Expert Campfire"
+  },
+  "objects": {
+    "mana_well":           { "name": "Mana Well",                  "effect": "10 mana every 5 sec." },
+    "fermenter":           { "name": "Fermenter",                  "effect": "Lets you create certain reagents." },
+    "alchemy_lab":         { "name": "Alchemy Laboratory",         "effect": "Required to craft certain items." },
+    "sharpening_wheel":    { "name": "Sharpening Wheel",           "effect": "+6 Strength." },
+    "anvil":               { "name": "Anvil",                      "effect": "" },
+    "master_forge":        { "name": "Master Forge",               "effect": "Required to craft certain items." },
+    "enchanted_lute":      { "name": "Enchanted Lute",             "effect": "+71 Armor and +2 to all stats." },
+    "arcane_disenchanter": { "name": "Arcane Salvager",            "effect": "Makes disenchanting more efficient." },
+    "arcane_forge":        { "name": "Arcane Forge",               "effect": "Required to craft certain items." },
+    "reagent_bot":         { "name": "Reagent Bot",                "effect": "Everyone nearby can buy reagents. No stat bonus." },
+    "repair_bot":          { "name": "Repair Bot",                 "effect": "Everyone nearby can buy reagents and repair gear." },
+    "anarchist_workbench": { "name": "Anarchist's Workbench",      "effect": "Required to craft certain items. No stat bonus." },
+    "first_aid_kit":       { "name": "First Aid Kit",              "effect": "+8 Stamina." },
+    "toxin_study":         { "name": "Toxin Study",                "effect": "Contains healing potions and anti-venom." },
+    "plague_lab":          { "name": "Plague Doctor's Laboratory", "effect": "Contains healing potions and poultices." },
+    "fish_bowl":           { "name": "Fish Bowl",                  "effect": "+8% to all stats." },
+    "fishing_rack":        { "name": "Fishing Rack",               "effect": "Catch uncommon fish for 1 hour; provides fishing lures." },
+    "fishing_hut":         { "name": "Fishing Hut",                "effect": "Catch rare fish for 1 hour; provides fishing lures." },
+    "incense_candle":      { "name": "Incense Candle",             "effect": "+6 Intellect." },
+    "greenhouse":          { "name": "Greenhouse",                 "effect": "Plant seeds and grow herbs." },
+    "seed_hybridizer":     { "name": "Seed Hybridizer",            "effect": "Multiply seeds or combine them into a higher rarity." },
+    "camp_tent":           { "name": "Camp Tent",                  "effect": "Rested experience builds up while you rest, up to 5% of a level (Boosted Rest, once per hour)." },
+    "tanning_rack":        { "name": "Tanning Rack",               "effect": "Lets you create certain reagents." },
+    "sewing_machine":      { "name": "Sewing Machine",             "effect": "Required to craft certain items." },
+    "lodestone":           { "name": "Lodestone",                  "effect": "+20 melee Attack Power." },
+    "rock_garden":         { "name": "Rock Garden",                "effect": "A common ore vein appears in it after a while." },
+    "smelter":             { "name": "Molten Foundry",             "effect": "Required to craft certain items." },
+    "camp_chair":          { "name": "Camp Chair",                 "effect": "+2% critical strike chance with spells and attacks." },
+    "field_guide":         { "name": "Field Guide",                "effect": "Read it to gain Track Beasts." },
+    "trappers_workbench":  { "name": "Trapper's Workbench",        "effect": "Contains one trap." },
+    "faction_banner":      { "name": "Faction Banner",             "effect": "+14 Spirit. Alliance and Horde have their own banner." },
+    "spinning_wheel":      { "name": "Spinning Wheel",             "effect": "Lets you create certain reagents." },
+    "loom":                { "name": "Loom",                       "effect": "Required to craft certain items." },
+    "cooking_feast":       { "name": "Cookie's Feast",             "effect": "A feast of food that raises Stamina. Needs a cooking fire." },
+    "iron_oven":           { "name": "Iron Oven",                  "effect": "Required for the most complex dishes. Needs a cooking fire." }
+  }
+}

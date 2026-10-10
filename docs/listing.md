@@ -14,6 +14,10 @@
 | Allow Comments | да |
 | Unlisted | нет |
 | Social links | GitHub: https://github.com/Vikquick/Campkeeper (Issues — https://github.com/Vikquick/Campkeeper/issues) |
+| Wiki | https://github.com/Vikquick/Campkeeper/wiki (страницы — `docs/wiki/`, публикация — `python tools/sync_wiki.py`) |
+| Issues URL | https://github.com/Vikquick/Campkeeper/issues |
+| Donation method | пока нет; если появится — Ko-fi (без комиссии площадки) |
+| Enable Project Pages | да: страница Roadmap (текст ниже) |
 | Game version | World of Warcraft: Forever (Interface 16001) — сборщик проставит сам |
 
 ## Description (EN)
@@ -59,3 +63,16 @@ Bugs and ideas: https://github.com/Vikquick/Campkeeper/issues
 - **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника в час; альты с профессиями, предметами, рецептами и перезарядкой.
 
 Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — альфа на время беты *Forever*.
+
+## Project Page «Roadmap» (CurseForge)
+
+Тот же текст, что `docs/wiki/Roadmap.md`, — при изменении правим оба.
+
+| When | Stage | What it brings |
+|---|---|---|
+| October 2026 | **Alpha** | Camp panel, timers and alerts, checked in the *Forever* beta. |
+| End of October 2026 | **Beta** | Camps on the map and sharing with guild, group and the shared channel, checked with several players. |
+| 4 November 2026 | **1.0** | Release together with *Forever*: catalog, planner and alts window checked on the live game. |
+| After launch | Updates | The catalog follows game patches; fixes from your reports. |
+
+Ideas and wishes are welcome in issues: https://github.com/Vikquick/Campkeeper/issues

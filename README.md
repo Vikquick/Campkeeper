@@ -92,6 +92,18 @@ New-Item -ItemType Junction -Path "<папка WoW>\_classic_beta_\Interface\Add
 
 Генератор останавливается с ошибкой, если предмета из таблицы нет в сканировании, навык не совпал или сдвинулся порядок объектов (это порядок битов в протоколе обмена — новые объекты только в конец). `python tools/gen_catalog.py --check` проверяет, что закоммиченный каталог актуален.
 
+### Вики
+
+Страницы вики для игроков лежат в `docs/wiki/` (английский) и публикуются в GitHub Wiki репозитория. `docs/wiki/Camp-Objects.md` генерируется из `Campkeeper/Data/Catalog.lua` и `tools/wiki_objects.json` (английские названия и эффекты); после правки каталога:
+
+```
+python tools/gen_wiki.py             — пересобрать страницу объектов
+python tools/sync_wiki.py --dry-run  — что изменится в вики
+python tools/sync_wiki.py            — опубликовать
+```
+
+Вики-репозиторий GitHub создаёт только после первой страницы, сохранённой в браузере (вкладка Wiki → Create the first page). Тест `tests/test_gen_wiki.py` падает, если страница объектов устарела или у нового объекта нет текста.
+
 ## Лицензия
 
 Campkeeper распространяется по лицензии MIT (`LICENSE`). Встроенные библиотеки в `Campkeeper/Libs` (Ace3, CallbackHandler, LibStub, HereBeDragons, LibDataBroker, LibDBIcon) — под своими лицензиями.
