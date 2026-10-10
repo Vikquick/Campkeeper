@@ -60,6 +60,18 @@ class ProfessionsTest(unittest.TestCase):
         env.fire("TRADE_SKILL_SHOW")
         self.assertTrue(env.ns.Professions.KnowsRecipe(env.ns.Professions, "mana_well"))
 
+    def test_recipes_from_the_window_survive_a_relog(self):
+        # beta 2026-10-10: IsPlayerSpell() is false for profession recipes, the login scan wiped them
+        env = started()
+        env.lua.execute("Mock.recipes[1230564] = true")  # Изготовить колодец маны
+        env.fire("TRADE_SKILL_SHOW")
+        env = env.relog(60)
+        self.assertTrue(env.ns.Professions.KnowsRecipe(env.ns.Professions, "mana_well"))
+        # the window stays authoritative: an unlearned recipe is cleared there
+        env.lua.execute("Mock.recipes[1230564] = false")
+        env.fire("TRADE_SKILL_SHOW")
+        self.assertFalse(env.ns.Professions.KnowsRecipe(env.ns.Professions, "mana_well"))
+
 
 class OwnCampTest(unittest.TestCase):
     def setUp(self):

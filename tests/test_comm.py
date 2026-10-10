@@ -135,17 +135,28 @@ class ChannelsTest(unittest.TestCase):
         pump(env)
         self.assertEqual([c for c, _, _ in sent(env)], ["PARTY"])
 
-    def test_queue_while_restricted(self):
+    def test_queue_during_chat_lockdown(self):
         env = started()
         env.advance(6)  # joined the shared channel
-        env.mock.addonRestricted = True
+        env.mock.chatLockdown = True
         env.mock.Cast(FIRE1_PLACE)
         pump(env)
         self.assertEqual(sent(env), [])
         self.assertGreater(env.ns.Comm.QueueLength(env.ns.Comm), 0)
-        env.mock.addonRestricted = False
+        env.mock.chatLockdown = False
         env.advance(5)
         self.assertEqual(len(sent(env)), 2)  # PARTY + CHANNEL
+        self.assertEqual(env.ns.Comm.QueueLength(env.ns.Comm), 0)
+
+
+    def test_restricted_flag_does_not_hold_messages(self):
+        # Forever beta: AreOutgoingAddonChatMessagesRestricted() is always true, messages still go out
+        env = started()
+        env.advance(6)
+        env.mock.addonRestricted = True
+        env.mock.Cast(FIRE1_PLACE)
+        pump(env)
+        self.assertEqual(sorted(c for c, _, _ in sent(env)), ["CHANNEL", "PARTY"])
         self.assertEqual(env.ns.Comm.QueueLength(env.ns.Comm), 0)
 
 
@@ -163,6 +174,14 @@ class EventsTest(unittest.TestCase):
         self.assertEqual((camps[0].source, camps[0].tier, camps[0].confirmed), ("party", 1, True))
         self.assertEqual(sorted(camps[0].objects.keys()), ["lodestone"])
         bob.assert_no_errors()
+
+    def test_own_echo_with_unique_names_is_ignored(self):
+        env = started('Mock.inGroup = true\nMock.uniqueNames = true\nMock.surname = "Narec"')
+        receive(env, camp_msg(env, id="AAAAAAAA-1"), "PARTY", "Tester Narec")
+        receive(env, camp_msg(env, id="BBBBBBBB-1", x=100, y=100), "PARTY", "Ann Lee")
+        camps = list(env.ns.CampStore.All(env.ns.CampStore).values())
+        self.assertEqual(len(camps), 1)  # only Ann's camp; our own message came back and was dropped
+        env.assert_no_errors()
 
     def test_sync_reply_after_random_delay(self):
         env = started("Mock.inGuild = true")

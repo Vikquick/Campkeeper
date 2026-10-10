@@ -2,8 +2,9 @@ local _, ns = ...
 local L = ns.L
 local Util = ns.Util
 
--- Camp panel next to the buffs. Shown while NEAR/SITTING/BUFFED, hidden 10 s after AWAY and
--- always hidden in combat. Rows that can be placed are secure item buttons; their attributes
+-- Camp panel next to the buffs. Shown at a camp (the "Campfire Nearby" aura, or sitting), hidden
+-- 10 s after leaving it even while Camp Benefits last (the buff shows their time), and always
+-- hidden in combat. Rows that can be placed are secure item buttons; their attributes
 -- (and the panel's visibility, since it parents them) change only out of combat.
 -- STATUS_WIDTH: the status/effect column has a fixed width; longer text is cut with an ellipsis
 -- and shown in full in the row tooltip.
@@ -215,7 +216,7 @@ end
 
 local function wanted()
   if not profile().enabled or inCombat() then return false end
-  return ns.CampState:Get() ~= "AWAY" or hideTimer ~= nil
+  return ns.CampState:Info().near or ns.CampState:Get() == "SITTING" or hideTimer ~= nil
 end
 
 function Panel:Update()
@@ -246,9 +247,10 @@ function Panel:Init()
                            "CAMP_COOLDOWN_UPDATED", "CATALOG_UPDATED", "SETTINGS_CHANGED" }) do
     ns.RegisterCallback(self, event, update)
   end
-  ns.RegisterCallback(self, "CAMP_STATE_CHANGED", function(_, _, new)
+  ns.RegisterCallback(self, "CAMP_STATE_CHANGED", update)
+  ns.RegisterCallback(self, "CAMP_NEAR_CHANGED", function(_, near)
     if hideTimer then hideTimer:Cancel(); hideTimer = nil end
-    if new == "AWAY" and frame:IsShown() then
+    if not near and frame:IsShown() then
       hideTimer = ns.api.timer(self.HIDE_DELAY, function() hideTimer = nil; Panel:Update() end)
     end
     Panel:Update()

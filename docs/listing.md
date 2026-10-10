@@ -32,7 +32,7 @@
 - Sitting countdown and the time your Camp Benefits end.
 
 ### Timers and alerts
-- Shared one-hour cooldown of camping items — for every character of your account.
+- Shared cooldown of camping items — for every character of your account.
 - Optional alerts: camp nearby, benefits received, benefits ending in 5 minutes, cooldown ready, your campfire going out.
 
 ### Camps on the map
@@ -41,7 +41,7 @@
 
 ### Catalog, planner, alts (`/ck`)
 - **Catalog:** every camp object by profession and tier, required skill, what it replaces, and which ones you can craft.
-- **Planner:** who in your group places the fire and which objects — one item per member per hour, class buffs in the group taken into account — and post the plan to group chat.
+- **Planner:** who in your group places the fire and which objects — one item per member, class buffs in the group taken into account — and post the plan to group chat.
 - **Alts:** professions, camping items, recipes and the cooldown of all your characters.
 
 ### Commands
@@ -62,9 +62,9 @@ Like Campkeeper? You can support it on Boosty: https://boosty.to/vikquick21/dona
 **Campkeeper** — помощник для системы лагерей *World of Warcraft: Forever*: костры, объекты профессий и часовой бафф «Бонусы лагеря».
 
 - **Панель лагеря** рядом с баффами: костёр, свободные места, когда погаснет ваш костёр; что уже стоит и что можете поставить вы — одним кликом из сумок (вне боя); отметка, если бонус перекрыт классовым баффом; отсчёт сидения и время окончания бонусов.
-- **Таймеры и оповещения:** общая часовая перезарядка походных предметов по всем персонажам; оповещения о лагере рядом, полученных и заканчивающихся бонусах, готовой перезарядке и гаснущем костре.
+- **Таймеры и оповещения:** общая перезарядка походных предметов по всем персонажам; оповещения о лагере рядом, полученных и заканчивающихся бонусах, готовой перезарядке и гаснущем костре.
 - **Лагеря на карте:** свои и посещённые лагеря на карте мира и миникарте, путевая точка по клику (поддерживается TomTom); обмен с гильдией, группой и необязательным общим каналом, чужие сообщения подтверждаются вторым игроком.
-- **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника в час; альты с профессиями, предметами, рецептами и перезарядкой.
+- **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника; альты с профессиями, предметами, рецептами и перезарядкой.
 
 Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — альфа на время беты *Forever*.
 

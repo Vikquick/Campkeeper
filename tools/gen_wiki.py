@@ -129,7 +129,8 @@ def render(catalog, texts):
         "",
         "## Rules that apply to every object",
         "",
-        "- All camping items share **one cooldown of 1 hour** per character.",
+        "- All camping items share **one cooldown** per character: 5 minutes in the current beta build, "
+        "although the item tooltips still say 1 hour.",
         "- An object needs a campfire nearby, and the fire has a limited number of places (see above).",
         "- Bonuses come from sitting by the fire for 1 minute; they last 1 hour as **Camp Benefits**.",
         "",

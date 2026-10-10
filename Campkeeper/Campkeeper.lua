@@ -116,6 +116,7 @@ function Campkeeper:PrintHelp()
   self:Print(L["/ck config - open settings"])
   self:Print(L["/ck debug [all||clear] - show the debug log"])
   self:Print(L["/ck report [clear] - beta data summary"])
+  self:Print(L["/ck commtest - test addon messages"])
 end
 
 function Campkeeper:PrintDebugLog(all)
@@ -146,6 +147,8 @@ function Campkeeper:ChatCommand(input)
       self:Print(L["Beta data (stays on your computer):"])
       for _, line in ipairs(ns.Research:Report()) do self:Print(line) end
     end
+  elseif cmd == "commtest" then
+    ns.Comm:SelfTest()
   elseif cmd == "config" then
     ns.Options:Open()
   elseif cmd == nil and ns.Window then

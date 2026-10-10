@@ -66,8 +66,9 @@ function Professions:ScanBags()
   if changed then ns.callbacks:Fire("PROFESSIONS_UPDATED", "items") end
 end
 
--- Known camp recipes. Without the profession window open only IsPlayerSpell is available;
--- with it open, the recipe list is authoritative.
+-- Known camp recipes. With the profession window open the recipe list is authoritative. Without it
+-- only IsPlayerSpell is available, and the Forever client answers false for profession recipes, so
+-- it may add a recipe but never clear one the window has seen.
 function Professions:ScanRecipes(fromWindow)
   local c = self:Char()
   local changed = false
@@ -75,7 +76,10 @@ function Professions:ScanRecipes(fromWindow)
     if o.craft then
       local known
       if fromWindow then known = ns.api.recipeLearned(o.craft) end
-      if known == nil then known = ns.api.isPlayerSpell(o.craft) end
+      if known == nil then
+        known = ns.api.isPlayerSpell(o.craft)
+        if not known then known = nil end
+      end
       if known ~= nil then
         known = known or nil
         if c.recipes[o.key] ~= known then c.recipes[o.key] = known; changed = true end

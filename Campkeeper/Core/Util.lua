@@ -130,6 +130,21 @@ function ns.api.hasBuffNamed(name)
   return aura ~= nil
 end
 
+-- Character names as chat senders show them. WoW Forever has regionally unique names: the
+-- sender is "Name Surname" while UnitName() returns only "Name". Elsewhere "Name" or "Name-Realm".
+function ns.api.unitFullName(unit)
+  local name, second = (UnitNameUnmodified or UnitName)(unit)
+  if not name or name == "" then return nil end
+  if not second or second == "" then return name end
+  local unique = RegionalUniqueNamesEnabled and Util.safeCall("RegionalUniqueNamesEnabled", RegionalUniqueNamesEnabled)
+  return name .. (unique and " " or "-") .. second
+end
+
+-- Sender of a chat or addon message in the same form as unitFullName().
+function ns.api.senderName(sender)
+  return Ambiguate and Ambiguate(sender, "none") or sender
+end
+
 local HBD = LibStub and LibStub("HereBeDragons-2.0", true)
 
 -- Player position: map coordinates for display and world coordinates for distances.

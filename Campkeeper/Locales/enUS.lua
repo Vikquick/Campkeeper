@@ -108,7 +108,7 @@ L["Nobody can light this fire (Cooking %d)"] = true
 
 -- Planner tab
 L["Who places what in the group camp"] = true
-L["Each member can place one camping item per hour (shared cooldown)."] = true
+L["Each member places one camping item now; the next one only after the shared cooldown."] = true
 L["Goal:"] = true
 L["Campfire:"] = true
 L["%s, %d places"] = true
@@ -140,3 +140,15 @@ L["Placement errors: %s"] = true
 L["Catalog check (build %s): missing items %d, missing spells %d"] = true
 L["Catalog check: not run yet"] = true
 L["Q5 queued: %s (why: %s); sent from the queue: %s"] = true
+
+-- Addon message test
+L["/ck commtest - test addon messages"] = true
+L["Addon messages: %s"] = true
+L["allowed"] = true
+L["restricted by the client (restricted)"] = true
+L["chat lockdown (lockdown)"] = true
+L["Test messages: %s"] = true
+L["Echo received: %s; no echo: %s"] = true
+L["echo"] = true
+L["Q5 client state: %s; changes: %d"] = true
+L["Q5 test: %s (%s)"] = true

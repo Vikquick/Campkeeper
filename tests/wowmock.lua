@@ -121,7 +121,14 @@ function GetCurrentRegionName() return "EU" end
 function GetRealmName() return "Realm" end
 function GetNormalizedRealmName() return "Realm" end
 function UnitName(unit) if unit == "player" then return "Tester", nil end end
-UnitNameUnmodified = UnitName
+-- WoW Forever: regionally unique names, "Name Surname" (Mock.uniqueNames, Mock.surname, group[i].surname)
+function RegionalUniqueNamesEnabled() return Mock.uniqueNames == true end
+C_GameRules = { IsGameRuleActive = function() return false end }
+Enum = Enum or {}
+Enum.GameRule = { HardcoreRuleset = 1, RPRuleset = 2, PvPRuleset = 3 }
+function UnitNameUnmodified(unit)
+  if unit == "player" then return "Tester", Mock.uniqueNames and Mock.surname or nil end
+end
 function UnitGUID(unit) if unit == "player" then return "Player-1234-0ABCDEF1" end end
 function UnitClass(unit) if unit == "player" then return "Warrior", "WARRIOR", 1 end end
 function UnitRace(unit) if unit == "player" then return "Human", "Human", 1 end end
@@ -606,14 +613,22 @@ function PanelTemplates_SetNumTabs(frame, n) frame.numTabs = n end
 function PanelTemplates_SetTab(frame, i) frame.selectedTab = i end
 function PanelTemplates_TabResize() end
 RAID_CLASS_COLORS = setmetatable({}, { __index = function() return { r = 1, g = 1, b = 1 } end })
-Mock.group = {} -- list of { name, class } for party1..N
-local _UnitName, _UnitClass = UnitName, UnitClass
+Mock.group = {} -- list of { name, class, surname? } for party1..N
+local _UnitName, _UnitNameUnmodified, _UnitClass = UnitName, UnitNameUnmodified, UnitClass
 function UnitName(unit)
   local i = unit:match("^party(%d)$")
   if i then local m = Mock.group[tonumber(i)]; return m and m.name end
   return _UnitName(unit)
 end
-UnitNameUnmodified = UnitName
+function UnitNameUnmodified(unit)
+  local i = unit:match("^party(%d)$")
+  if i then
+    local m = Mock.group[tonumber(i)]
+    if m then return m.name, Mock.uniqueNames and m.surname or nil end
+    return
+  end
+  return _UnitNameUnmodified(unit)
+end
 function UnitClass(unit)
   local i = unit:match("^party(%d)$")
   if i then local m = Mock.group[tonumber(i)]; if m then return m.class, m.class, 1 end return end

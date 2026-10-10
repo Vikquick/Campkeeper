@@ -45,10 +45,10 @@ end
 
 -- Group members: { name, class, professions, source = "self"|"addon"|"none" }.
 function PlannerTab:Members()
-  local me = UnitName("player")
+  local me = ns.api.unitFullName("player")
   local out = {}
   for _, unit in ipairs(groupUnits()) do
-    local name = UnitName(unit)
+    local name = ns.api.unitFullName(unit)
     if name then
       local _, class = UnitClass(unit)
       local profs, source = {}, "none"
@@ -177,7 +177,7 @@ local SOURCE = { self = "you", addon = "via Campkeeper", none = "no Campkeeper" 
 
 function PlannerTab:Create(parent)
   label(parent, L["Who places what in the group camp"], "GameFontNormalLarge", 0, 0)
-  label(parent, L["Each member can place one camping item per hour (shared cooldown)."], "GameFontHighlightSmall", 0, -20, 660)
+  label(parent, L["Each member places one camping item now; the next one only after the shared cooldown."], "GameFontHighlightSmall", 0, -20, 660)
 
   label(parent, L["Goal:"], "GameFontNormal", 0, -46)
   local roleOptions = {}

@@ -7,7 +7,8 @@ local L = ns.L
 --   q2        distance to the own campfire when "Campfire Nearby" appears / disappears
 --   q3        new player auras while at a camp (Boosted Rest candidates, tent flagged)
 --   q4        blueprints in the bags that mention camp objects, learned or not
---   q5        addon messages sent / echoed back / received from others, per distribution
+--   q5        addon messages sent / echoed back / received from others, per distribution; client
+--             state every flush tick (free / restricted / lockdown) with its changes; `/ck commtest` runs
 --   blocked   ADDON_ACTION_BLOCKED / _FORBIDDEN for Campkeeper
 --   fire      seconds between placing the own fire and losing its aura next to it
 --   durations distinct durations of the sitting and benefits auras
@@ -24,7 +25,8 @@ local function store()
   local r = ns.db.global.research
   for _, key in ipairs({ "q1", "q2", "q3", "q4", "blocked", "fire", "errors" }) do r[key] = r[key] or {} end
   r.q5 = r.q5 or {}
-  for _, key in ipairs({ "sent", "queued", "flushed", "reasons", "echo", "others", "senders" }) do
+  for _, key in ipairs({ "sent", "queued", "flushed", "reasons", "echo", "others", "senders", "state", "changes",
+                        "tests" }) do
     r.q5[key] = r.q5[key] or {}
   end
   r.durations = r.durations or { sitting = {}, benefits = {} }
@@ -202,11 +204,61 @@ function Research:OnFlushed(distribution)
   if enabled() then inc(store().q5.flushed, distribution) end
 end
 
+-- Every flush tick: is the client letting addon messages out right now? Changes keep their context.
+local lastState
+function Research:OnCommState(why)
+  if not enabled() then return end
+  local q5, state = store().q5, why or "free"
+  inc(q5.state, state)
+  if lastState and lastState ~= state then
+    local pos = ns.api.playerPosition()
+    push(q5.changes, { t = now(), from = lastState, to = state, combat = ns.api.inCombat() == true,
+                       instance = select(2, IsInInstance()), mapID = pos and pos.mapID })
+  end
+  lastState = state
+end
+
+-- `/ck commtest`: chat types in print order, the whisper to yourself first.
+local function testTypes(test)
+  local out = {}
+  for chatType in pairs(test.results) do if chatType ~= "WHISPER" then out[#out + 1] = chatType end end
+  table.sort(out)
+  if test.results.WHISPER then table.insert(out, 1, "WHISPER") end
+  return out
+end
+
+local function stateText(why)
+  if why == "restricted" then return L["restricted by the client (restricted)"] end
+  if why == "lockdown" then return L["chat lockdown (lockdown)"] end
+  return L["allowed"]
+end
+
+function Research:OnTestStarted(test)
+  local parts = {}
+  for _, chatType in ipairs(testTypes(test)) do parts[#parts + 1] = chatType .. " " .. test.results[chatType] end
+  ns.addon:Print(L["Addon messages: %s"]:format(stateText(test.why)))
+  ns.addon:Print(L["Test messages: %s"]:format(table.concat(parts, ", ")))
+end
+
+function Research:OnTestDone(test)
+  local got, missing = {}, {}
+  for _, chatType in ipairs(testTypes(test)) do
+    table.insert(test.echo[chatType] and got or missing, chatType)
+  end
+  table.sort(got)
+  ns.addon:Print(L["Echo received: %s; no echo: %s"]:format(#got > 0 and table.concat(got, ", ") or "-",
+                                                            #missing > 0 and table.concat(missing, ", ") or "-"))
+  if enabled() then
+    push(store().q5.tests, { t = now(), why = test.why or "free", results = test.results, echo = test.echo,
+                             order = testTypes(test) })
+  end
+end
+
 function Research:OnAddonMessage(prefix, distribution, sender)
   if not enabled() or prefix ~= ns.Protocol.PREFIX then return end
   local q5 = store().q5
-  local name = Ambiguate and Ambiguate(sender, "none") or sender
-  if name == UnitName("player") then
+  local name = ns.api.senderName(sender)
+  if name == ns.api.unitFullName("player") then
     inc(q5.echo, distribution)
   else
     inc(q5.others, distribution)
@@ -297,6 +349,17 @@ function Research:Report()
   add("Q5 queued: %s (why: %s); sent from the queue: %s", keysJoined(r.q5.queued), keysJoined(r.q5.reasons),
       keysJoined(r.q5.flushed))
 
+  local changes = #r.q5.changes
+  add("Q5 client state: %s; changes: %d", keysJoined(r.q5.state), changes)
+  local test = r.q5.tests[#r.q5.tests]
+  if test then
+    local parts = {}
+    for _, chatType in ipairs(test.order) do
+      parts[#parts + 1] = ("%s %s %s"):format(chatType, test.results[chatType], test.echo[chatType] and L["echo"] or "-")
+    end
+    add("Q5 test: %s (%s)", table.concat(parts, ", "), test.why)
+  end
+
   add("Blocked actions: %d", #r.blocked)
   local burn = {}
   for _, e in ipairs(r.fire) do burn[#burn + 1] = e.elapsed end
@@ -337,6 +400,9 @@ function Research:Init()
   ns.RegisterCallback(self, "CAMP_BENEFITS_GAINED", function(_, _, info) Research:OnBenefitsGained(info) end)
   ns.RegisterCallback(self, "COMM_SENT", function(_, distribution, why) Research:OnSent(distribution, why) end)
   ns.RegisterCallback(self, "COMM_FLUSHED", function(_, distribution) Research:OnFlushed(distribution) end)
+  ns.RegisterCallback(self, "COMM_STATE", function(_, why) Research:OnCommState(why) end)
+  ns.RegisterCallback(self, "COMM_TEST_STARTED", function(_, test) Research:OnTestStarted(test) end)
+  ns.RegisterCallback(self, "COMM_TEST_DONE", function(_, test) Research:OnTestDone(test) end)
   ns.RegisterCallback(self, "CAMP_UI_ERROR", function(_, errorType, message, key) Research:OnUIError(errorType, message, key) end)
 
   local pending

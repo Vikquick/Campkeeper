@@ -4,9 +4,12 @@ local L = ns.L
 -- Channels, sending and receiving. GUILD, PARTY/RAID and the hidden shared channel "Campkeeper".
 -- Messages go out only on events: own fire/object placed, benefits parsed (camp seen), and replies
 -- to a guild SYNC (at most two members answer, after a random 2-8 s, with fresh camps only).
--- While the client restricts outgoing addon messages they wait in a queue.
+-- During a chat lockdown outgoing addon messages wait in a queue. The client of WoW Forever reports
+-- AreOutgoingAddonChatMessagesRestricted() all the time in the open world, yet guild and channel
+-- messages go out and echo back (beta 2026-10-10, /ck commtest), so that flag alone does not hold
+-- anything back; it is only recorded for research.
 local Comm = { CHANNEL = "Campkeeper", JOIN_DELAY = 5, SYNC_DELAY = 10, SYNC_REPLIES = 2, REPLY_MIN = 2,
-               REPLY_MAX = 8, MAX_REPLY_CAMPS = 20, FLUSH = 5, PRIORITY = "BULK" }
+               REPLY_MAX = 8, MAX_REPLY_CAMPS = 20, FLUSH = 5, PRIORITY = "BULK", TEST_WAIT = 5 }
 ns.Comm = Comm
 
 local Protocol = ns.Protocol
@@ -26,11 +29,9 @@ local function restricted()
   return nil
 end
 
-local function playerName() return UnitName("player") end
+local function playerName() return ns.api.unitFullName("player") end
 
-local function shortName(sender)
-  return Ambiguate and Ambiguate(sender, "none") or (sender:match("^[^-]+") or sender)
-end
+local function shortName(sender) return ns.api.senderName(sender) end
 
 function Comm:ChannelID()
   local id = GetChannelName(self.CHANNEL)
@@ -60,10 +61,12 @@ function Comm:Distributions()
   return out
 end
 
+local function holds(why) return why == "lockdown" end
+
 function Comm:Send(msg, distribution, target)
   local text = Protocol:Encode(msg)
   local why = restricted()
-  if why then
+  if holds(why) then
     queue[#queue + 1] = { text, distribution, target }
     ns.callbacks:Fire("COMM_SENT", distribution, why)
     return false
@@ -74,7 +77,9 @@ function Comm:Send(msg, distribution, target)
 end
 
 function Comm:Flush()
-  if #queue == 0 or restricted() then return end
+  local why = restricted()
+  ns.callbacks:Fire("COMM_STATE", why)
+  if #queue == 0 or holds(why) then return end
   local pending = queue
   queue = {}
   for _, q in ipairs(pending) do
@@ -152,8 +157,41 @@ local function handle(text, distribution, sender)
   end
 end
 
+-- `/ck commtest`: sends a test message to yourself and to every current distribution, bypassing
+-- the restriction check, and reports what the client returned and which ones echoed back.
+local function resultName(result)
+  if type(result) == "boolean" then return result and "ok" or "failed" end
+  if result == nil then return "nil" end
+  for name, value in pairs(Enum and Enum.SendAddonMessageResult or {}) do
+    if value == result then return value == 0 and "ok" or name end
+  end
+  return tostring(result)
+end
+
+function Comm:SelfTest()
+  local token = ("CKTEST %d"):format(ns.api.serverTime())
+  local test = { token = token, why = restricted(), results = {}, echo = {} }
+  self.test = test
+  local targets = { { "WHISPER", playerName() } }
+  for _, d in ipairs(self:Distributions()) do targets[#targets + 1] = d end
+  for _, d in ipairs(targets) do
+    local ok, result = pcall(C_ChatInfo.SendAddonMessage, Protocol.PREFIX, token, d[1], d[2])
+    test.results[d[1]] = ok and resultName(result) or ("error: " .. tostring(result))
+  end
+  ns.callbacks:Fire("COMM_TEST_STARTED", test)
+  ns.api.after(self.TEST_WAIT, function()
+    if self.test == test then self.test = nil end
+    ns.callbacks:Fire("COMM_TEST_DONE", test)
+  end)
+  return test
+end
+
 -- AceComm callback. Nothing here may break the rest of the addon.
 function Comm:OnMessage(text, distribution, sender)
+  if self.test and text == self.test.token then
+    self.test.echo[distribution] = true
+    return
+  end
   local ok, err = pcall(handle, text, distribution, sender)
   if not ok then ns.log("comm", "error handling message from %s: %s", tostring(sender), tostring(err)) end
 end

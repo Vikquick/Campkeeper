@@ -4,7 +4,8 @@ local _, ns = ...
 --   input  { members = { { name, class, professions = { [professionKey] = skill } } },
 --            fireTier = 1|2|3 (or slots = 3|5|10), role = "leveling"|"dungeon"|"craft" }
 --   result { fire = { member, tier }?, objects = { { member, key, tier, weight } }, slots }
--- Every camping item shares one 1-hour cooldown, so each member places at most one thing; the
+-- Every camping item shares one cooldown (1 h in the 1.60.1 tooltips, 5 min measured in build 70334),
+-- so setting up a camp each member places at most one thing; the
 -- fire goes to the capable member least needed for anything else. Objects whose class buff someone in the group already provides are skipped;
 -- the rest are ranked by the role's weights and each family gets the highest tier still
 -- available among unassigned members. Ties break by name, so equal input gives equal output.

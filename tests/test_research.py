@@ -129,6 +129,59 @@ class Q5Test(unittest.TestCase):
         self.assertEqual(q5.flushed["PARTY"], 1)
 
 
+    def test_client_state_samples_and_changes(self):
+        env = started()
+        env.advance(10)
+        q5 = research(env)["q5"]
+        self.assertGreaterEqual(q5.state["free"], 2)
+        env.mock.addonRestricted = True
+        env.advance(5)
+        self.assertEqual(q5.state["restricted"], 1)
+        change = list(q5.changes.values())[-1]
+        self.assertEqual((change["from"], change["to"]), ("free", "restricted"))
+        self.assertIsNotNone(change["combat"])
+        env.advance(5)
+        self.assertEqual(len(list(q5.changes.values())), 1)  # no new entry without a change
+
+
+class CommTestCommand(unittest.TestCase):
+    def test_sends_past_the_restriction_and_reports_echo(self):
+        env = started()
+        env.advance(6)  # joined the shared channel
+        env.mock.addonRestricted = True
+        env.mock.Slash("/ck commtest")
+        tests = [s for s in env.mock.sent.values()
+                 if s.kind == "addon" and s.prefix == "CAMPK" and s.msg.startswith("CKTEST")]
+        self.assertEqual(sorted(s.chatType for s in tests), ["CHANNEL", "PARTY", "WHISPER"])
+        whisper = next(s for s in tests if s.chatType == "WHISPER")
+        self.assertEqual(whisper.target, "Tester")
+        env.fire("CHAT_MSG_ADDON", "CAMPK", whisper.msg, "WHISPER", "Tester-Realm")
+        env.advance(5)
+        last = list(research(env)["q5"]["tests"].values())[-1]
+        self.assertEqual(last["why"], "restricted")
+        self.assertEqual(last["results"]["WHISPER"], "ok")
+        self.assertTrue(last["echo"]["WHISPER"])
+        self.assertIsNone(last["echo"]["PARTY"])
+        chat = "\n".join(env.chat())
+        self.assertIn("Сообщения аддонов: ограничены клиентом (restricted)", chat)
+        self.assertIn("Эхо получено: WHISPER; нет эха: CHANNEL, PARTY", chat)
+        env.mock.Slash("/ck report")
+        self.assertIn("Q5 проверка: WHISPER ok эхо, CHANNEL ok -, PARTY ok - (restricted)", "\n".join(env.chat()))
+        env.assert_no_errors()
+
+
+    def test_whisper_and_echo_use_the_surname(self):
+        env = started('Mock.uniqueNames = true\nMock.surname = "Narec"')
+        env.mock.Slash("/ck commtest")
+        whisper = next(s for s in env.mock.sent.values() if s.kind == "addon" and s.chatType == "WHISPER")
+        self.assertEqual(whisper.target, "Tester Narec")
+        env.fire("CHAT_MSG_ADDON", "CAMPK", whisper.msg, "WHISPER", "Tester Narec")
+        env.advance(5)
+        q5 = research(env)["q5"]
+        self.assertEqual(q5.echo["WHISPER"], 1)
+        self.assertIsNone(q5.others["WHISPER"])
+
+
 class BlockedErrorsCatalogTest(unittest.TestCase):
     def test_blocked_errors_and_catalog(self):
         env = started("Mock.missingItems = { [279960] = true }\nMock.missingSpells = { [1307254] = true }")

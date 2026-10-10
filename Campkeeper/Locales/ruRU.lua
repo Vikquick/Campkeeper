@@ -107,7 +107,7 @@ L["Nobody can light this fire (Cooking %d)"] = "Этот костёр неком
 
 -- Planner tab
 L["Who places what in the group camp"] = "Кто что ставит в лагере группы"
-L["Each member can place one camping item per hour (shared cooldown)."] = "Каждый участник может поставить один походный предмет в час (общая перезарядка)."
+L["Each member places one camping item now; the next one only after the shared cooldown."] = "Каждый участник ставит один походный предмет сейчас; следующий - только после общей перезарядки."
 L["Goal:"] = "Цель:"
 L["Campfire:"] = "Костёр:"
 L["%s, %d places"] = "%s, мест: %d"
@@ -139,3 +139,15 @@ L["Placement errors: %s"] = "Ошибки установки: %s"
 L["Catalog check (build %s): missing items %d, missing spells %d"] = "Проверка каталога (сборка %s): нет предметов %d, нет заклинаний %d"
 L["Catalog check: not run yet"] = "Проверка каталога ещё не выполнялась"
 L["Q5 queued: %s (why: %s); sent from the queue: %s"] = "Q5 в очереди: %s (причина: %s); отправлено из очереди: %s"
+
+-- Addon message test
+L["/ck commtest - test addon messages"] = "/ck commtest - проверка сообщений аддонов"
+L["Addon messages: %s"] = "Сообщения аддонов: %s"
+L["allowed"] = "разрешены"
+L["restricted by the client (restricted)"] = "ограничены клиентом (restricted)"
+L["chat lockdown (lockdown)"] = "блокировка чата (lockdown)"
+L["Test messages: %s"] = "Тестовые сообщения: %s"
+L["Echo received: %s; no echo: %s"] = "Эхо получено: %s; нет эха: %s"
+L["echo"] = "эхо"
+L["Q5 client state: %s; changes: %d"] = "Q5 состояние клиента: %s; смен: %d"
+L["Q5 test: %s (%s)"] = "Q5 проверка: %s (%s)"

@@ -59,11 +59,11 @@ class CatalogTabTest(unittest.TestCase):
         env.assert_no_errors()
 
 
-def send_professions(env, sender, professions):
+def send_professions(env, sender, professions, realm="-Realm"):
     """A group member's Campkeeper reports professions ({skillLineID: skill}) in party chat."""
     text = env.ns.Protocol.Encode(env.ns.Protocol, env.lua.table_from(
         {"v": 1, "t": "PROF", "p": env.lua.table_from(professions)}))
-    env.fire("CHAT_MSG_ADDON", PREFIX, text, "PARTY", sender + "-Realm")
+    env.fire("CHAT_MSG_ADDON", PREFIX, text, "PARTY", sender + realm)
 
 
 class PlannerTabTest(unittest.TestCase):
@@ -83,6 +83,18 @@ class PlannerTabTest(unittest.TestCase):
         send_professions(env, "Bob", {186: 150, 164: 300, 9999: 5})
         bob = self.members()["Bob"]
         self.assertEqual((bob.source, bob.professions.mining, bob.professions.blacksmithing), ("addon", 150, 300))
+        env.assert_no_errors()
+
+    def test_members_with_unique_names(self):
+        # WoW Forever: senders are "Name Surname", UnitName() gives only "Name"
+        env = started('Mock.inGroup = true\nMock.uniqueNames = true\nMock.surname = "Narec"\n'
+                      'Mock.group = { { name = "Bob", surname = "Stone", class = "PALADIN" } }')
+        tab = env.ns.PlannerTab
+        send_professions(env, "Bob Stone", {186: 150}, realm="")
+        m = {x.name: x for x in tab.Members(tab).values()}
+        self.assertEqual(sorted(m), ["Bob Stone", "Tester Narec"])
+        self.assertEqual(m["Tester Narec"].source, "self")
+        self.assertEqual((m["Bob Stone"].source, m["Bob Stone"].professions.mining), ("addon", 150))
         env.assert_no_errors()
 
     def test_plan_to_group_chat(self):

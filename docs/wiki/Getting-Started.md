@@ -50,7 +50,7 @@ Turn each one on or off in `/ck config`:
 ## The window (`/ck`)
 
 - **Catalog**: every camp object by profession and tier, the skill it needs, what it replaces, and which ones you know how to make.
-- **Planner**: who in your group lights the fire and who places which object. It knows that each member can place one camping item per hour, skips bonuses your group already has from class buffs, and can post the plan to group chat. Choose a goal: leveling, dungeon or crafting.
+- **Planner**: who in your group lights the fire and who places which object. It knows that each member places one camping item at a time, skips bonuses your group already has from class buffs, and can post the plan to group chat. Choose a goal: leveling, dungeon or crafting.
 - **Alts**: professions, camping items, recipes and the camping cooldown of all your characters.
 
 Group members without Campkeeper are listed too, but their professions are unknown, so the planner cannot give them a task.

@@ -43,11 +43,11 @@ How to learn the higher-tier objects is not fully known yet; in the beta client 
 - Each stat bonus is **mutually exclusive with a class buff**: the Lodestone with Blessing of Might, the Incense Candle with Arcane Intellect, and so on. You get one or the other, not both, so in a group with a paladin the Lodestone gives nothing.
 - The **Camp Tent** gives a separate aura, **Boosted Rest**, for 1 hour: more rested experience while you rest, up to 5% of a level, once per hour.
 
-## The one-hour cooldown
+## The shared cooldown
 
-All camping items share **one cooldown of 1 hour** per character: a campfire and an object are both "camping items". So one character places **one thing per hour**.
+All camping items share **one cooldown** per character: a campfire and an object are both "camping items", so one character places **one thing at a time**. In the current beta build the cooldown is **5 minutes**, although the item tooltips still say 1 hour; earlier builds used the full hour.
 
-That is why camps are a group activity: a five-person group can put up a fire and four objects at once, while a single player gets one object an hour.
+That is why camps are a group activity: a five-person group can put up a fire and four objects at once, while a single player has to wait for the cooldown between each one.
 
 ## Placing objects
 
@@ -58,7 +58,7 @@ That is why camps are a group activity: a five-person group can put up a fire an
 ## How Campkeeper helps
 
 - The **camp panel** shows the fire, the free places, what is already in the camp, and which of your items you can add right now; one click places it.
-- **Timers** for sitting, Camp Benefits and the 1-hour cooldown of every character of your account.
+- **Timers** for sitting, Camp Benefits and the shared cooldown of every character of your account.
 - **Camps on the map**, shared with your guild and group.
 - A **planner** that decides who in the group lights the fire and who places which object, skipping bonuses your group already has from class buffs.
 

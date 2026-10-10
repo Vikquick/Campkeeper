@@ -43,6 +43,22 @@ class VisibilityTest(unittest.TestCase):
         self.assertFalse(shown(env))
         env.assert_no_errors()
 
+    def test_benefits_away_from_the_fire_do_not_keep_it(self):
+        # author's choice 2026-10-10: the panel is for the camp; the buff itself shows the time left
+        env = started()
+        near = env.mock.AddAura(NEAR)
+        env.mock.AddAura(BENEFITS, 3600)
+        env.advance(1)
+        self.assertTrue(shown(env))
+        env.mock.RemoveAura(near)
+        env.advance(9)
+        self.assertTrue(shown(env))
+        env.advance(2)
+        self.assertFalse(shown(env))
+        env.mock.AddAura(NEAR)  # back at a camp with the benefits still on
+        self.assertTrue(shown(env))
+        env.assert_no_errors()
+
     def test_hidden_in_combat_and_back_after(self):
         env = started()
         env.mock.AddAura(NEAR)
