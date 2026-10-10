@@ -38,9 +38,9 @@ def main(argv=None):
         try:
             git("clone", "--quiet", url, str(clone), cwd=ROOT)
         except subprocess.CalledProcessError as e:
-            print(f"error: cannot clone {url}\n{e.stderr.strip()}\n"
-                  "Create the first wiki page on GitHub (Wiki tab -> Create the first page), then retry.",
-                  file=sys.stderr)
+            hint = ("Create the first wiki page on GitHub (Wiki tab -> Create the first page), then retry."
+                    if "not found" in e.stderr.lower() else "Check the connection to GitHub and retry.")
+            print(f"error: cannot clone {url}\n{e.stderr.strip()}\n{hint}", file=sys.stderr)
             return 1
         for page in sorted(PAGES.glob("*.md")):
             shutil.copyfile(page, clone / page.name)
