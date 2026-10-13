@@ -172,5 +172,56 @@ class LogNoiseTest(unittest.TestCase):
         self.assertEqual(len(msgs), 1)
 
 
+
+class AnnounceButtonTest(unittest.TestCase):
+    def click(self, button):
+        button.GetScript(button, "OnClick")(button)
+
+    def open_keys(self, env):
+        return [b.key for b in panel(env).channelButtons.values() if b.shown]
+
+    def test_button_opens_only_available_channels(self):
+        env = started("Mock.inGuild = true")
+        env.mock.AddAura(NEAR)
+        p = panel(env)
+        self.assertTrue(p.announceButton.shown)
+        self.assertEqual(p.announceButton.text, "Объявить")
+        self.assertEqual(self.open_keys(env), [])
+        height = p.frame.height
+        self.click(p.announceButton)
+        self.assertEqual(self.open_keys(env), ["guild", "general"])
+        self.assertEqual([b.text for b in p.channelButtons.values() if b.shown], ["В гильдию", "В общий чат"])
+        self.assertGreater(p.frame.height, height)
+        self.click(p.announceButton)
+        self.assertEqual(self.open_keys(env), [])
+        self.assertEqual(p.frame.height, height)
+        env.assert_no_errors()
+
+    def test_channel_button_announces_once_and_explains_a_refusal(self):
+        env = started("Mock.inGuild = true")
+        env.mock.AddAura(NEAR)
+        p = panel(env)
+        self.click(p.announceButton)
+        guild = next(b for b in p.channelButtons.values() if b.key == "guild")
+        self.click(guild)
+        sent = [s for s in env.mock.sent.values() if s.kind == "chat"]
+        self.assertEqual([s.chatType for s in sent], ["GUILD"])
+        self.assertEqual(self.open_keys(env), [])  # the choice closes after sending
+        self.click(p.announceButton)
+        self.click(guild)
+        self.assertEqual(len([s for s in env.mock.sent.values() if s.kind == "chat"]), 1)
+        self.assertIn("Подождите", p.hint.text)
+        env.assert_no_errors()
+
+    def test_choice_closes_when_the_panel_hides(self):
+        env = started()
+        near = env.mock.AddAura(NEAR)
+        self.click(panel(env).announceButton)
+        env.mock.RemoveAura(near)
+        env.advance(11)
+        env.mock.AddAura(NEAR)
+        self.assertEqual(self.open_keys(env), [])
+
+
 if __name__ == "__main__":
     unittest.main()

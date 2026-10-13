@@ -97,6 +97,12 @@ function Alerts:AddOptions()
       set = function(_, v) ns.db.profile.alerts[kind] = v end,
     }
   end
+  args.readyCheck = {
+    type = "toggle", name = L["Camp benefits of the group at a ready check"], order = #self.KINDS + 1, width = "full",
+    desc = L["Shown only to you, nothing is sent to chat."],
+    get = function() return ns.db.profile.alerts.readyCheck ~= false end,
+    set = function(_, v) ns.db.profile.alerts.readyCheck = v end,
+  }
   ns.Options:AddGroup("alerts", { type = "group", name = L["Alerts"], inline = true, args = args })
 end
 

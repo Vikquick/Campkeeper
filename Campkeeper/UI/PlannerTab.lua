@@ -3,8 +3,9 @@ local L = ns.L
 
 -- Planner tab: group members with professions (own data and PROF messages from their Campkeeper;
 -- members without the addon are listed but not planned), fire tier and role -> plan, and a button
--- that posts it to group chat.
-local PlannerTab = { PROF_DELAY = 3, MAX_PLAN_LINES = 12, MAX_MEMBERS = 10 }
+-- that posts it to group chat. Each member also shows the Camp Benefits state (Core/GroupBenefits),
+-- refreshed every BENEFITS_REFRESH seconds while the window is open.
+local PlannerTab = { PROF_DELAY = 3, MAX_PLAN_LINES = 12, MAX_MEMBERS = 10, BENEFITS_REFRESH = 5 }
 ns.PlannerTab = PlannerTab
 
 local ROLE_LABEL = { leveling = "Leveling", dungeon = "Dungeon", craft = "Crafting" }
@@ -32,16 +33,7 @@ function PlannerTab:OnProfessions(name, payload)
   if ns.Window:IsShown() then self:Refresh() end
 end
 
-local function groupUnits()
-  local units = { "player" }
-  if IsInRaid() then
-    units = {}
-    for i = 1, GetNumGroupMembers() do units[#units + 1] = "raid" .. i end
-  elseif IsInGroup() then
-    for i = 1, GetNumGroupMembers() - 1 do units[#units + 1] = "party" .. i end
-  end
-  return units
-end
+local function groupUnits() return ns.GroupBenefits:Units() end
 
 -- Group members: { name, class, professions, source = "self"|"addon"|"none" }.
 function PlannerTab:Members()
@@ -175,6 +167,12 @@ end
 
 local SOURCE = { self = "you", addon = "via Campkeeper", none = "no Campkeeper" }
 
+local function benefitsText(m)
+  if not m or m.state == "unknown" then return L["benefits unknown"] end
+  if m.state == "none" then return L["no camp benefits"] end
+  return m.remaining and L["benefits: %d min"]:format(math.ceil(m.remaining / 60)) or L["has camp benefits"]
+end
+
 function PlannerTab:Create(parent)
   label(parent, L["Who places what in the group camp"], "GameFontNormalLarge", 0, 0)
   label(parent, L["Each member places one camping item now; the next one only after the shared cooldown."], "GameFontHighlightSmall", 0, -20, 660)
@@ -197,9 +195,11 @@ function PlannerTab:Create(parent)
     local y = -120 - (i - 1) * ROW
     local row = {
       name = label(parent, "", "GameFontHighlight", 0, y, 240),
+      benefits = label(parent, "", "GameFontHighlightSmall", 245, y - 1, RIGHT - 255),
       profs = label(parent, "", "GameFontDisableSmall", 12, y - 14, RIGHT - 24),
     }
     row.name:SetWordWrap(false)
+    row.benefits:SetWordWrap(false)
     row.profs:SetWordWrap(false)
     ui.members[i] = row
   end
@@ -213,6 +213,8 @@ function PlannerTab:Create(parent)
   ui.notes = label(parent, "", "GameFontDisableSmall", RIGHT, -120 - self.MAX_PLAN_LINES * 16 - 6, 270)
   ui.post = button(parent, L["Post the plan to group chat"], 220, function() PlannerTab:PostToChat() end)
   ui.post:SetPoint("BOTTOMRIGHT", 0, 0)
+  ui.postBenefits = button(parent, L["Post camp benefits to group chat"], 260, function() ns.GroupBenefits:PostToChat() end)
+  ui.postBenefits:SetPoint("BOTTOMLEFT", 0, 0)
   self.ui = ui
 end
 
@@ -222,9 +224,13 @@ function PlannerTab:Refresh()
   ui.fires.sync()
 
   local members = self:Members()
+  local benefits = {}
+  for _, b in ipairs(ns.GroupBenefits:Status()) do benefits[b.name] = b end
   for i, row in ipairs(ui.members) do
     local m = members[i]
     if m then
+      row.benefits:SetText(benefitsText(benefits[m.name]))
+      row.benefits:Show()
       local profs = {}
       for key, skill in pairs(m.professions) do
         profs[#profs + 1] = ("%s %d"):format(L[ns.CatalogTab.PROFESSION_NAMES[key]], skill)
@@ -238,6 +244,7 @@ function PlannerTab:Refresh()
     else
       row.memberName = nil
       row.name:Hide()
+      row.benefits:Hide()
       row.profs:Hide()
     end
   end
@@ -248,11 +255,18 @@ function PlannerTab:Refresh()
   local notes = self:Notes(plan)
   ui.notes:SetText(table.concat(notes, "\n\n"))
   ui.post:SetEnabled(#lines > 0)
+  ui.postBenefits:SetEnabled(IsInGroup() == true)
   self.lastPlan, self.lastLines, self.lastNotes = plan, lines, notes
 end
 
 function PlannerTab:Init()
   ns.RegisterCallback(self, "GROUP_PROFESSIONS", function(_, name, payload) PlannerTab:OnProfessions(name, payload) end)
+  -- the benefits column: while the window is open, and right after a fight (auras are hidden in combat)
+  local function refresh() if ns.Window:IsShown() then PlannerTab:Refresh() end end
+  self.ticker = C_Timer.NewTicker(self.BENEFITS_REFRESH, refresh)
+  local combat = CreateFrame("Frame")
+  combat:RegisterEvent("PLAYER_REGEN_ENABLED")
+  combat:SetScript("OnEvent", refresh)
   local pending
   local events = CreateFrame("Frame")
   events:RegisterEvent("GROUP_ROSTER_UPDATE")

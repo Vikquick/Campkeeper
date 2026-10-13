@@ -102,7 +102,7 @@ end
 function Comm:FreshCamps()
   local out = {}
   for _, r in ipairs(ns.CampStore:All()) do
-    if r.confirmed and r.source ~= "channel" and r.mapID and r.x then out[#out + 1] = r end
+    if r.confirmed and ns.CampStore.RANK[r.source] > 1 and r.mapID and r.x then out[#out + 1] = r end
     if #out >= self.MAX_REPLY_CAMPS then break end
   end
   return out
@@ -208,6 +208,20 @@ function Comm:AddOptions()
           sharing().channel = v
           if v then Comm:JoinChannel() else Comm:LeaveChannel() end
         end,
+      },
+      chat = {
+        type = "toggle", name = L["Read camps from chat"], width = "full", order = 2,
+        desc = L["Messages with a map pin and a word about a camp add the camp to your map."],
+        get = function() return sharing().chat end,
+        set = function(_, v) sharing().chat = v end,
+      },
+      language = {
+        type = "select", name = L["Language of announcements"], order = 3,
+        desc = L["The language of the line the Announce button posts in chat. Other Campkeeper users understand it in any language."],
+        values = { client = L["Same as the game"], enUS = L["English"], ruRU = L["Russian"] },
+        sorting = { "client", "enUS", "ruRU" },
+        get = function() return ns.Announce:Language() end,
+        set = function(_, v) ns.db.profile.announce.language = v end,
       },
     },
   })

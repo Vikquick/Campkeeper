@@ -152,3 +152,39 @@ L["Echo received: %s; no echo: %s"] = true
 L["echo"] = true
 L["Q5 client state: %s; changes: %d"] = true
 L["Q5 test: %s (%s)"] = true
+
+-- Camp announcement in chat
+L["%d min left."] = true
+L["You are not at a camp."] = true
+L["That chat is not available right now."] = true
+L["This camp is already announced in that chat. Wait %s."] = true
+L["/ck announce [group||guild||general] - announce this camp in chat"] = true
+L["Announce"] = true
+L["To group"] = true
+L["To guild"] = true
+L["To general chat"] = true
+
+-- Camps from chat
+L["Read camps from chat"] = true
+L["Messages with a map pin and a word about a camp add the camp to your map."] = true
+L["chat"] = true
+
+-- Camp benefits of the group
+L["No camp benefits: %s"] = true
+L["Camp benefits unknown: %s"] = true
+L["Everyone has camp benefits."] = true
+L["Camp benefits of the group at a ready check"] = true
+L["Shown only to you, nothing is sent to chat."] = true
+L["Post camp benefits to group chat"] = true
+L["benefits unknown"] = true
+L["no camp benefits"] = true
+L["benefits: %d min"] = true
+L["has camp benefits"] = true
+L["The announcement did not appear in chat: the game may not have let it through."] = true
+L["Language of announcements"] = true
+L["The language of the line the Announce button posts in chat. Other Campkeeper users understand it in any language."] = true
+L["Same as the game"] = true
+L["English"] = true
+L["Russian"] = true
+L["Camp here"] = true
+L["Nothing is known about this camp yet: sit by the fire and the announcement will list what it has."] = true

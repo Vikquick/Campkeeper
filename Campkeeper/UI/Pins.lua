@@ -9,7 +9,8 @@ ns.Pins = Pins
 
 local HBDPins = LibStub("HereBeDragons-Pins-2.0")
 local DEFAULT_ICON = "Interface\\Icons\\Spell_Fire_Fire"
-local SOURCE = { self = "your camp", seen = "seen by you", party = "group", guild = "guild", channel = "shared channel" }
+local SOURCE = { self = "your camp", seen = "seen by you", party = "group", guild = "guild", channel = "shared channel",
+                 chat = "chat" }
 
 local pool, used = {}, {}
 

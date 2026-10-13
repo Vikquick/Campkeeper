@@ -8,8 +8,9 @@ local _, ns = ...
 local CampStore = { MERGE_RANGE = 30, UNTIMED_TTL = 600, LIMIT = 200, CONFIRMATIONS = 2 }
 ns.CampStore = CampStore
 
--- Higher rank = more precise coordinates and more trust.
-CampStore.RANK = { channel = 1, party = 2, guild = 2, seen = 3, self = 4 }
+-- Higher rank = more precise coordinates and more trust. "chat" is a camp read from ordinary
+-- chat (anyone can write it): never saved between sessions and never passed on to other players.
+CampStore.RANK = { channel = 1, chat = 1, party = 2, guild = 2, seen = 3, self = 4 }
 
 local function camps() return ns.db.global.camps end
 
@@ -117,13 +118,13 @@ function CampStore:Prune(now)
   return removed
 end
 
--- Keep at most LIMIT records: the oldest channel reports go first, then the oldest of any source.
+-- Keep at most LIMIT records: the oldest channel and chat reports go first, then the oldest of any source.
 function CampStore:EnforceLimit()
   local list = {}
   for _, r in pairs(camps()) do list[#list + 1] = r end
   if #list <= self.LIMIT then return end
   table.sort(list, function(a, b)
-    local ca, cb = a.source == "channel", b.source == "channel"
+    local ca, cb = CampStore.RANK[a.source] == 1, CampStore.RANK[b.source] == 1
     if ca ~= cb then return ca end
     return a.lastSeen < b.lastSeen
   end)
@@ -191,4 +192,14 @@ function CampStore:Init()
   end)
   self:Prune()
   self.ticker = C_Timer.NewTicker(30, function() CampStore:Prune() end)
+  -- older versions do not know the "chat" source: keep it out of the saved variables
+  local events = CreateFrame("Frame")
+  events:RegisterEvent("PLAYER_LOGOUT")
+  events:SetScript("OnEvent", function()
+    local all = camps() -- nil when empty: AceDB has already stripped the default table
+    if not all then return end
+    for id, r in pairs(all) do
+      if r.source == "chat" then all[id] = nil end
+    end
+  end)
 end

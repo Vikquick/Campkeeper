@@ -20,13 +20,15 @@ ns.defaults = {
   profile = {
     panel = { enabled = true },
     minimap = { hide = false },
-    alerts = { near = true, gained = true, ending = true, cooldown = true, fire = true },
-    sharing = { channel = true },
+    alerts = { near = true, gained = true, ending = true, cooldown = true, fire = true, readyCheck = true },
+    sharing = { channel = true, chat = true },
+    announce = { language = "client" },
     research = true,
   },
 }
 
 local DEBUG_TAIL = 20
+local ANNOUNCE_KEYS = { group = true, guild = true, general = true }
 
 function Campkeeper:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("CampkeeperDB", ns.defaults, true)
@@ -100,6 +102,8 @@ function Campkeeper:OnEnable()
   ns.OwnCamp:UpdateCooldown()
   ns.CampStore:Init()
   ns.Comm:Init()
+  ns.ChatCamps:Init()
+  ns.GroupBenefits:Init()
   ns.Research:Init()
   ns.Alerts:Init()
   ns.Panel:Init()
@@ -117,6 +121,7 @@ function Campkeeper:PrintHelp()
   self:Print(L["/ck debug [all||clear] - show the debug log"])
   self:Print(L["/ck report [clear] - beta data summary"])
   self:Print(L["/ck commtest - test addon messages"])
+  self:Print(L["/ck announce [group||guild||general] - announce this camp in chat"])
 end
 
 function Campkeeper:PrintDebugLog(all)
@@ -149,6 +154,14 @@ function Campkeeper:ChatCommand(input)
     end
   elseif cmd == "commtest" then
     ns.Comm:SelfTest()
+  elseif cmd == "announce" then
+    local key = arg and arg:lower()
+    if key and not ANNOUNCE_KEYS[key] then
+      self:Print(L["/ck announce [group||guild||general] - announce this camp in chat"])
+    else
+      local ok, why = ns.Announce:Send(key)
+      if not ok then self:Print(why) end
+    end
   elseif cmd == "config" then
     ns.Options:Open()
   elseif cmd == nil and ns.Window then

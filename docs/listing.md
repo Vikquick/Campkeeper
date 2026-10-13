@@ -38,15 +38,19 @@
 ### Camps on the map
 - Your own camps and camps you used appear on the world map and the minimap; click a pin for a waypoint (TomTom supported).
 - Camps are shared with your guild, your group and an optional shared channel. Reports from strangers are shown faded until a second player confirms them.
+- **Announce** a camp in group, guild or general chat with one click: the fire, its objects, the time left and a clickable map pin that works for players without the addon. Write it in the language of your game, in English or in Russian; other Campkeeper users understand it in any language.
+- Camps other players post in chat with a map pin appear on your map, even if they do not use Campkeeper.
 
 ### Catalog, planner, alts (`/ck`)
 - **Catalog:** every camp object by profession and tier, required skill, what it replaces, and which ones you can craft.
 - **Planner:** who in your group places the fire and which objects — one item per member, class buffs in the group taken into account — and post the plan to group chat.
+- **Camp benefits of the group:** who has Camp Benefits and for how long, a button that tells the group who is missing them, and a private summary at every ready check.
 - **Alts:** professions, camping items, recipes and the cooldown of all your characters.
 
 ### Commands
 - `/ck` or `/campkeeper` — open the window
 - `/ck config` — settings
+- `/ck announce` — announce the camp you stand at in chat
 - `/ck debug` — diagnostic log (please attach it to bug reports)
 
 Campkeeper is in **beta** while *Forever* is in beta. Object names come from your game client, so it works in every language; the interface is in English and Russian.
@@ -64,9 +68,11 @@ Like Campkeeper? You can support it on Boosty: https://boosty.to/vikquick21/dona
 - **Панель лагеря** рядом с баффами: костёр, свободные места, когда погаснет ваш костёр; что уже стоит и что можете поставить вы — одним кликом из сумок (вне боя); отметка, если бонус перекрыт классовым баффом; отсчёт сидения и время окончания бонусов.
 - **Таймеры и оповещения:** общая перезарядка походных предметов по всем персонажам; оповещения о лагере рядом, полученных и заканчивающихся бонусах, готовой перезарядке и гаснущем костре.
 - **Лагеря на карте:** свои и посещённые лагеря на карте мира и миникарте, путевая точка по клику (поддерживается TomTom); обмен с гильдией, группой и необязательным общим каналом, чужие сообщения подтверждаются вторым игроком.
+- **Объявление в чат:** одной кнопкой рассказать о лагере группе, гильдии или общему чату — костёр, объекты, время до угасания и кликабельная метка на карте, которая работает и у игроков без аддона. Язык объявления выбирается: как в игре, английский или русский; игроки с Campkeeper понимают его на любом языке. Лагеря, о которых другие пишут в чат с меткой, появляются на вашей карте.
+- **Бонусы группы:** у кого есть «Бонусы лагеря» и сколько осталось, кнопка «кому сесть у костра» в чат группы и сводка только для вас при проверке готовности.
 - **Окно `/ck`:** каталог объектов по профессиям и тирам; планировщик «кто что ставит» с учётом классовых баффов и одного предмета на участника; альты с профессиями, предметами, рецептами и перезарядкой.
 
-Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck debug`. Статус — бета на время беты *Forever*.
+Команды: `/ck` (`/campkeeper`), `/ck config`, `/ck announce`, `/ck debug`. Статус — бета на время беты *Forever*.
 
 Справка по лагерям и всем объектам: https://github.com/Vikquick/Campkeeper/wiki
 

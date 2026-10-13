@@ -188,6 +188,27 @@ function ns.api.playerAura(spellID)
            expirationTime = aura.expirationTime, duration = aura.duration }
 end
 
+-- Aura of a group member by spell ID, with the same three answers as playerAura: table, false,
+-- or nil when it cannot be read (the member is out of sight or the client hides the values).
+function ns.api.unitAura(unit, spellID)
+  if UnitIsUnit and Util.safeCall("UnitIsUnit", UnitIsUnit, unit, "player") or unit == "player" then
+    return ns.api.playerAura(spellID)
+  end
+  local read = C_UnitAuras and C_UnitAuras.GetUnitAuraBySpellID
+  if not read or not Util.safeCall("UnitIsVisible", UnitIsVisible, unit) then return nil end
+  local ok, aura = pcall(read, unit, spellID)
+  if not ok then
+    ns.log("api", "GetUnitAuraBySpellID(%s, %d): %s", unit, spellID, tostring(aura))
+    return nil
+  end
+  if aura == nil then return false end
+  if Util.isSecret(aura) or Util.isSecret(aura.auraInstanceID) or Util.isSecret(aura.expirationTime) then
+    return nil
+  end
+  return { instanceID = aura.auraInstanceID, spellID = spellID, expirationTime = aura.expirationTime,
+           duration = aura.duration }
+end
+
 -- Tooltip lines (left text) of a player buff, or nil when unavailable.
 function ns.api.buffTooltipLines(auraInstanceID)
   local data = Util.safeCall("C_TooltipInfo.GetUnitBuffByAuraInstanceID",

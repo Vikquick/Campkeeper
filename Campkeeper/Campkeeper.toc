@@ -19,6 +19,7 @@ Campkeeper.lua
 Core\Log.lua
 Core\Util.lua
 Data\Catalog.lua
+Data\Names.lua
 Core\Catalog.lua
 Core\CampState.lua
 Core\BenefitsParser.lua
@@ -27,8 +28,11 @@ Core\OwnCamp.lua
 Core\PanelModel.lua
 Core\CampStore.lua
 Core\Planner.lua
+Core\Announce.lua
+Core\GroupBenefits.lua
 Comm\Protocol.lua
 Comm\Comm.lua
+Comm\ChatCamps.lua
 Dev\Research.lua
 
 UI\Options.lua

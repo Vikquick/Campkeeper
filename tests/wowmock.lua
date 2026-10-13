@@ -331,6 +331,11 @@ function CreateFrame(kind, name, parent, template)
   f.template = template
   f.protected = template ~= nil and tostring(template):find("Secure") ~= nil
   table.insert(Mock.frames, f)
+  -- the dropdown template makes named parts AceGUI looks up through _G (select options)
+  if template == "UIDropDownMenuTemplate" and name then
+    for _, part in ipairs({ "Left", "Middle", "Right", "Text" }) do newRegion("Texture", name .. part, f) end
+    newRegion("Button", name .. "Button", f)
+  end
   return f
 end
 
@@ -613,26 +618,50 @@ function PanelTemplates_SetNumTabs(frame, n) frame.numTabs = n end
 function PanelTemplates_SetTab(frame, i) frame.selectedTab = i end
 function PanelTemplates_TabResize() end
 RAID_CLASS_COLORS = setmetatable({}, { __index = function() return { r = 1, g = 1, b = 1 } end })
-Mock.group = {} -- list of { name, class, surname? } for party1..N
+-- list of { name, class, surname?, benefits? = seconds of Camp Benefits left, visible? = false when
+-- out of range } for party1..N
+Mock.group = {}
+-- party1..N are the members; in a raid they are raid1..N and the player is raid(N+1)
+local function memberIndex(unit)
+  local i = unit:match("^party(%d+)$") or unit:match("^raid(%d+)$")
+  return (i and Mock.group[tonumber(i)]) and i or nil
+end
+local function selfUnit(unit)
+  return unit == "raid" .. (#Mock.group + 1) and "player" or unit
+end
 local _UnitName, _UnitNameUnmodified, _UnitClass = UnitName, UnitNameUnmodified, UnitClass
 function UnitName(unit)
-  local i = unit:match("^party(%d)$")
+  local i = memberIndex(unit)
   if i then local m = Mock.group[tonumber(i)]; return m and m.name end
-  return _UnitName(unit)
+  return _UnitName(selfUnit(unit))
 end
 function UnitNameUnmodified(unit)
-  local i = unit:match("^party(%d)$")
+  local i = memberIndex(unit)
   if i then
     local m = Mock.group[tonumber(i)]
     if m then return m.name, Mock.uniqueNames and m.surname or nil end
     return
   end
-  return _UnitNameUnmodified(unit)
+  return _UnitNameUnmodified(selfUnit(unit))
+end
+function UnitIsVisible(unit)
+  local i = memberIndex(unit)
+  if i then local m = Mock.group[tonumber(i)]; return m ~= nil and m.visible ~= false end
+  return selfUnit(unit) == "player"
+end
+-- Auras of group members: only Camp Benefits (Mock.group[i].benefits), secret with Mock.secretAuras.
+function C_UnitAuras.GetUnitAuraBySpellID(unit, spellID)
+  if selfUnit(unit) == "player" then return C_UnitAuras.GetPlayerAuraBySpellID(spellID) end
+  local i = memberIndex(unit)
+  local m = i and Mock.group[tonumber(i)]
+  if not m or not m.benefits or spellID ~= 1229741 then return nil end
+  if Mock.secretAuras then return { auraInstanceID = Mock.Secret(), expirationTime = Mock.Secret() } end
+  return { auraInstanceID = 5000 + tonumber(i), spellId = spellID, duration = 3600, expirationTime = Mock.time + m.benefits }
 end
 function UnitClass(unit)
-  local i = unit:match("^party(%d)$")
+  local i = memberIndex(unit)
   if i then local m = Mock.group[tonumber(i)]; if m then return m.class, m.class, 1 end return end
-  return _UnitClass(unit)
+  return _UnitClass(selfUnit(unit))
 end
 function GetNumGroupMembers() return #Mock.group > 0 and #Mock.group + 1 or 0 end
 
@@ -689,6 +718,7 @@ function Mock.Slash(line)
 end
 
 local prefixes = {}
+Mock.generalChannel = 1 -- local id of the zone's General channel; nil when the player left it
 C_ChatInfo = {
   RegisterAddonMessagePrefix = function(p) prefixes[p] = true; return true end,
   IsAddonMessagePrefixRegistered = function(p) return prefixes[p] == true end,
@@ -700,6 +730,7 @@ C_ChatInfo = {
     return C_ChatInfo.SendAddonMessage(prefix, msg, chatType, target)
   end,
   InChatMessagingLockdown = function() return Mock.chatLockdown == true end,
+  GetGeneralChannelLocalID = function() return Mock.generalChannel end,
   AreOutgoingAddonChatMessagesRestricted = function() return Mock.addonRestricted == true end,
 }
 Enum.SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3, GeneralError = 9 }

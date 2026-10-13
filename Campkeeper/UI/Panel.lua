@@ -15,7 +15,12 @@ local STATUS_TEXT = { placed = "placed", placeable = "click to place", covered =
 local STATUS_COLOR = { placed = { 0.3, 1, 0.3 }, placeable = { 1, 0.82, 0 }, covered = { 0.6, 0.6, 0.6 } }
 
 local frame, rows, title, fireText, cooldownText, restText, bar, barText, hint
+local announceButton, channelButtons
 local pendingUpdate, hideTimer, hintTimer = false, nil, nil
+local announceOpen = false -- the chat choice under the "Announce" button
+
+local CHANNEL_TEXT = { group = "To group", guild = "To guild", general = "To general chat" }
+local CHANNEL_ORDER = { "group", "guild", "general" }
 
 local function inCombat() return InCombatLockdown() end
 
@@ -110,6 +115,30 @@ local function create()
   hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   hint:SetTextColor(1, 0.3, 0.3)
   hint:SetJustifyH("LEFT")
+
+  -- Announcing in chat: ordinary buttons, the secure rows above are not touched.
+  announceButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+  announceButton:SetSize(96, 18)
+  announceButton:SetText(L["Announce"])
+  announceButton:SetScript("OnClick", function()
+    announceOpen = not announceOpen
+    Panel:Update()
+  end)
+  channelButtons = {}
+  for i, key in ipairs(CHANNEL_ORDER) do
+    local b = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    b:SetSize(92, 18)
+    b:SetText(L[CHANNEL_TEXT[key]])
+    b.key = key
+    b:SetScript("OnClick", function()
+      announceOpen = false
+      local ok, why = ns.Announce:Send(key)
+      if ok then Panel:Update() else Panel:ShowHint(why) end
+    end)
+    b:Hide()
+    channelButtons[i] = b
+  end
+  Panel.announceButton, Panel.channelButtons = announceButton, channelButtons
 
   rows = {}
   for i = 1, Panel.MAX_ROWS do rows[i] = createRow(i) end
@@ -206,6 +235,25 @@ local function render(model)
   bar:SetValue(value)
   barText:SetText(text)
   y = y - 22
+  announceButton:ClearAllPoints()
+  announceButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, y)
+  y = y - 20
+  local available = {}
+  if announceOpen then
+    for _, c in ipairs(ns.Announce:Channels()) do available[c.key] = true end
+  end
+  local x = 8
+  for _, b in ipairs(channelButtons) do
+    if available[b.key] then
+      b:ClearAllPoints()
+      b:SetPoint("TOPLEFT", frame, "TOPLEFT", x, y)
+      b:Show()
+      x = x + 96
+    else
+      b:Hide()
+    end
+  end
+  if x > 8 then y = y - 20 end
   if hint:GetText() then
     hint:ClearAllPoints()
     hint:SetPoint("TOPLEFT", 8, y)
@@ -228,7 +276,12 @@ function Panel:Update()
   self.model = model
   render(model)
   applySecure(model)
-  if wanted() then frame:Show() else frame:Hide() end
+  if wanted() then
+    frame:Show()
+  else
+    frame:Hide()
+    announceOpen = false
+  end
 end
 
 function Panel:ShowHint(text)

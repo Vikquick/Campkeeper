@@ -97,6 +97,31 @@ class PlannerTabTest(unittest.TestCase):
         self.assertEqual((m["Bob Stone"].source, m["Bob Stone"].professions.mining), ("addon", 150))
         env.assert_no_errors()
 
+    def test_camp_benefits_of_members_and_chat_button(self):
+        env = started('Mock.inGroup = true\nMock.group = { { name = "Bob", class = "PALADIN", benefits = 2400 }, '
+                      '{ name = "Kim", class = "ROGUE" }, { name = "Zed", class = "MAGE", visible = false } }')
+        tab = env.ns.PlannerTab
+        env.ns.Window.Show(env.ns.Window, 2)
+
+        def shown():
+            return {r.memberName: r.benefits.text for r in tab.ui.members.values() if r.memberName}
+
+        self.assertEqual(shown(), {"Tester": "нет бонусов", "Bob": "бонусы: 40 мин", "Kim": "нет бонусов",
+                                   "Zed": "бонусы неизвестны"})
+        env.lua.execute("Mock.group[2].benefits = 590")  # refreshed while the tab is open
+        env.advance(5)
+        self.assertEqual(shown()["Kim"], "бонусы: 10 мин")
+        button = tab.ui.postBenefits
+        button.GetScript(button, "OnClick")(button)
+        chat = [(s.chatType, s.msg) for s in env.mock.sent.values() if s.kind == "chat"]
+        self.assertEqual(chat, [("PARTY", "Без бонусов лагеря: Tester")])
+        env.assert_no_errors()
+
+    def test_benefits_button_needs_a_group(self):
+        env = started()
+        env.ns.Window.Show(env.ns.Window, 2)
+        self.assertFalse(env.ns.PlannerTab.ui.postBenefits.enabled)
+
     def test_plan_to_group_chat(self):
         env = self.env
         send_professions(env, "Kim", {185: 10})
